@@ -13,6 +13,7 @@ type Config struct {
 	Port      string `yaml:"port"`
 	JWTSecret string `yaml:"jwt_secret"`
 	Debug     bool   `yaml:"is_debug"`
+	Env       string `yaml:"env"`
 }
 
 type ConfigPostgres struct {

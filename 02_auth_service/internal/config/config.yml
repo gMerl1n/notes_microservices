@@ -1,4 +1,5 @@
 is_debug: true
+env: "local"
 
 jwt_secret: $3cr3t
 
