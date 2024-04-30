@@ -17,10 +17,10 @@ type Storage interface {
 
 type Repository struct {
 	db     *pgxpool.Pool
-	logger slog.Logger
+	logger *slog.Logger
 }
 
-func NewRepository(db *pgxpool.Pool, logger slog.Logger) *Repository {
+func NewRepository(db *pgxpool.Pool, logger *slog.Logger) *Repository {
 	return &Repository{db: db, logger: logger}
 }
 

@@ -8,7 +8,6 @@ import (
 )
 
 type Config struct {
-	Postgres  ConfigPostgres
 	BindAddr  string `yaml:"bind_ip"`
 	Port      string `yaml:"port"`
 	JWTSecret string `yaml:"jwt_secret"`
@@ -16,16 +15,7 @@ type Config struct {
 	Env       string `yaml:"env"`
 }
 
-type ConfigPostgres struct {
-	Host     string `yaml:"db.host"`
-	Port     string `yaml:"db.port"`
-	User     string `yaml:"db.username"`
-	Password string `yaml:"db.password"`
-	NameDB   string `yaml:"db.dbname"`
-	SSLMode  string `yaml:"db.sslmode"`
-}
-
-func MustLoad() *Config {
+func LoadConfig() *Config {
 	path := fetchConfigPath()
 	if path == "" {
 		panic("config path is empty")

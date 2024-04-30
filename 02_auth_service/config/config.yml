@@ -6,9 +6,9 @@ jwt_secret: $3cr3t
 bind_ip: 0.0.0.0
 port: ":10001"
 
-db:
+storage:
   username: "postgres"
-  host: "db"
+  host: "localhost"
   port: "5432"
   dbname: "postgres"
   sslmode: "disable"

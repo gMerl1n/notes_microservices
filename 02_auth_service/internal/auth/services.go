@@ -14,7 +14,11 @@ type Service interface {
 type service struct {
 	// создаем структуру, которая принимает репозиторий для работы с БД
 	storage Storage
-	logger  slog.Logger
+	logger  *slog.Logger
+}
+
+func NewService(repo *Repository, log *slog.Logger) *service {
+	return &service{storage: repo, logger: log}
 }
 
 func (s *service) CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID string, err error) {
