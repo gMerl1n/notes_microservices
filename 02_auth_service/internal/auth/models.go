@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -20,18 +21,31 @@ type CreateUserDTO struct {
 
 func NewUser(dto CreateUserDTO) User {
 	return User{
+		UUID:     uuid.New().String(),
 		Email:    dto.Email,
 		Password: dto.Password,
 	}
 }
 
-func (u *User) CheckPassword(password string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
-	if err != nil {
-		return fmt.Errorf("password does not match")
-	}
-	return nil
+type LoginUserDTO struct {
+	Email    string
+	Password string
 }
+
+func LoginUser(dto LoginUserDTO) User {
+	return User{
+		Email:    dto.Email,
+		Password: dto.Password,
+	}
+}
+
+// func (u *User) CheckPassword(password string) error {
+// 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+// 	if err != nil {
+// 		return fmt.Errorf("password does not match")
+// 	}
+// 	return nil
+// }
 
 func (u *User) GeneratePasswordHash() error {
 	pwd, err := generatePasswordHash(u.Password)

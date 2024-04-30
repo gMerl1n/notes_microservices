@@ -33,10 +33,19 @@ func main() {
 		os.Getenv("POSTGRES_HOST"),
 		os.Getenv("POSTGRES_PORT"),
 		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
 		os.Getenv("POSTGRES_DB"),
 		os.Getenv("SSLMODE"),
-		os.Getenv("DB_PASSWORD"),
 	)
+
+	// return &ConfigPostgres{
+	// 	Host:     host,
+	// 	Port:     port,
+	// 	User:     user,
+	// 	Password: password,
+	// 	NameDB:   db_name,
+	// 	SSLMode:  sslmode}
+
 	ctx := context.Background()
 	client, err := db.NewPostgresDB(ctx, confDB)
 

@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
 	CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID string, err error)
-	GetUserByUUID(ctx context.Context, uuid string) (*User, error)
+	GetByEmailAndPassword(ctx context.Context, loginUser LoginUserDTO) (*User, error)
 }
 
 type service struct {
@@ -45,6 +47,21 @@ func (s *service) CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID s
 	return userUUID, nil
 }
 
-func (s *service) GetUserByUUID(ctx context.Context, uuid string) (*User, error) {
-	return nil, nil
+func (s *service) GetByEmailAndPassword(ctx context.Context, loginUser LoginUserDTO) (*User, error) {
+
+	lgUser := LoginUser(loginUser)
+
+	user, err := s.storage.GetByEmail(ctx, lgUser.Email)
+
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(user)
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(lgUser.Password)); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
