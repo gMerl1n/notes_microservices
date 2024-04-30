@@ -13,6 +13,7 @@ type Config struct {
 	JWTSecret string `yaml:"jwt_secret"`
 	Debug     bool   `yaml:"is_debug"`
 	Env       string `yaml:"env"`
+	TokenTTL  int    `yaml:"tokenTTL"`
 }
 
 func LoadConfig() *Config {

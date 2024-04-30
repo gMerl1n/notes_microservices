@@ -5,21 +5,22 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/iriskin77/notes_microservices/pkg/jwt"
+	"github.com/iriskin77/notes_microservices/app/pkg/jwt"
 )
 
 type Handler struct {
-	services Service
-	logger   *slog.Logger
+	services     Service
+	tokenManager jwt.TokenManager
+	logger       *slog.Logger
 }
 
-func NewHandler(services Service, logger *slog.Logger) *Handler {
+func NewHandler(services Service, tokenManager jwt.TokenManager, logger *slog.Logger) *Handler {
 	return &Handler{
-		services: services,
-		logger:   logger,
+		services:     services,
+		tokenManager: tokenManager,
+		logger:       logger,
 	}
 }
 
@@ -76,12 +77,22 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err.Error())
 	}
 
-	token, err := jwt.NewToken(user.UUID, user.Email, time.Second*60)
+	token, err := h.tokenManager.NewJWT(user.UUID)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	tokenBytes, err := json.Marshal(token)
+	refreshToken, err := h.tokenManager.NewRefreshToken()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	res := jwt.TokenResponse{
+		AccessToken:  token,
+		RefreshToken: refreshToken,
+	}
+
+	tokenBytes, err := json.Marshal(res)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

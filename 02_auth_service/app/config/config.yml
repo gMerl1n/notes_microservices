@@ -2,6 +2,7 @@ is_debug: true
 env: "local"
 
 jwt_secret: $3cr3t
+tokenTTL: 1
 
 bind_ip: 0.0.0.0
 port: ":10001"

@@ -9,10 +9,11 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/iriskin77/notes_microservices/internal/auth"
-	"github.com/iriskin77/notes_microservices/internal/config"
-	"github.com/iriskin77/notes_microservices/pkg/db"
-	"github.com/iriskin77/notes_microservices/pkg/logging"
+	"github.com/iriskin77/notes_microservices/app/internal/auth"
+	"github.com/iriskin77/notes_microservices/app/internal/config"
+	"github.com/iriskin77/notes_microservices/app/pkg/db"
+	"github.com/iriskin77/notes_microservices/app/pkg/jwt"
+	"github.com/iriskin77/notes_microservices/app/pkg/logging"
 	"github.com/joho/godotenv"
 )
 
@@ -53,10 +54,17 @@ func main() {
 		fmt.Println(err.Error())
 	}
 
+	// initializing tokenManager to generate JWT
+
+	tokenManager, err := jwt.NewManager(conf.JWTSecret, time.Duration(conf.TokenTTL)*time.Minute)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
 	// initializing server
 	repo := auth.NewRepository(client, logger)
 	service := auth.NewService(repo, logger)
-	h := auth.NewHandler(service, logger)
+	h := auth.NewHandler(service, tokenManager, logger)
 
 	router := mux.NewRouter()
 
