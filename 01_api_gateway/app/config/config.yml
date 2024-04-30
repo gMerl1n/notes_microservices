@@ -1,6 +1,0 @@
-
-
-
-auth_service:
-    login_url: http://localhost:10001/api/auth/user
-    register_url: http://localhost:10001/api/auth/createuser

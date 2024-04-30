@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from app.config.config import config
+from app.settings import settings
 import requests
 import json
 
@@ -13,8 +13,7 @@ async def login():
     """Авторизация пользователя"""
 
     try:
-        login_url = config.get_login_url()
-        auth_token = requests.get(url=login_url, data=json.dumps({"email": "123", "password_hash": "123"}))
+        auth_token = requests.get(url=settings.LOGIN_URL, data=json.dumps({"email": "123", "password_hash": "123"}))
     except Exception as ex:
         raise HTTPException(status_code=500, detail="Internal server error")
 
