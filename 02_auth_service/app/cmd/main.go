@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -14,6 +15,7 @@ import (
 	"github.com/iriskin77/notes_microservices/app/pkg/db"
 	"github.com/iriskin77/notes_microservices/app/pkg/jwt"
 	"github.com/iriskin77/notes_microservices/app/pkg/logging"
+	"github.com/iriskin77/notes_microservices/app/pkg/redis"
 	"github.com/joho/godotenv"
 )
 
@@ -39,20 +41,29 @@ func main() {
 		os.Getenv("SSLMODE"),
 	)
 
-	// return &ConfigPostgres{
-	// 	Host:     host,
-	// 	Port:     port,
-	// 	User:     user,
-	// 	Password: password,
-	// 	NameDB:   db_name,
-	// 	SSLMode:  sslmode}
-
 	ctx := context.Background()
 	client, err := db.NewPostgresDB(ctx, confDB)
 
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+
+	// initializing Redis
+
+	i, _ := strconv.Atoi(os.Getenv("REDIS_DB"))
+
+	redisConfig := redis.NewRedisConfig(
+		os.Getenv("REDIS_PORT"),
+		os.Getenv("REDIS_PASSWORD"),
+		i,
+	)
+
+	clientRedis, err := redis.NewRedisClient(redisConfig)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	fmt.Println(clientRedis)
 
 	// initializing tokenManager to generate JWT
 
