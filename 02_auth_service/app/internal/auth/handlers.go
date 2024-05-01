@@ -7,24 +7,27 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/iriskin77/notes_microservices/app/pkg/jwt"
 )
 
 type Handler struct {
-	services Service
-	logger   *slog.Logger
+	services     Service
+	tokenManager jwt.TokenManager
+	logger       *slog.Logger
 }
 
-func NewHandler(services Service, logger *slog.Logger) *Handler {
+func NewHandler(services Service, tokenManager jwt.TokenManager, logger *slog.Logger) *Handler {
 	return &Handler{
-		services: services,
-		logger:   logger,
+		services:     services,
+		tokenManager: tokenManager,
+		logger:       logger,
 	}
 }
 
 func (h *Handler) RegisterHandlers(router *mux.Router) {
 	router.HandleFunc("/api/auth/createuser", h.CreateUser).Methods("Post")
 	router.HandleFunc("/api/auth/user", h.Login).Methods("Get")
-	router.HandleFunc("/api/auth/refresh_tokens", h.RefreshTokens).Methods("Get")
+	router.HandleFunc("/api/auth/refresh_tokens", h.AuthMiddleware(h.RefreshTokens)).Methods("Get")
 }
 
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {

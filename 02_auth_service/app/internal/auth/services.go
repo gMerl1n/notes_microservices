@@ -16,10 +16,6 @@ type Service interface {
 	RefreshTokens(ctx context.Context, refreshToken string) (jwt.Tokens, error)
 }
 
-// type StoreRedis interface {
-// 	SetSession(ctx context.Context, SID string, sess Session, lifetime time.Duration) error
-// }
-
 type service struct {
 	// создаем структуру, которая принимает репозиторий для работы с БД
 	storage         Storage

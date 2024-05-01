@@ -70,15 +70,18 @@ func main() {
 	// accessTokenTTL  int    `yaml:"access_tokenTTL"`
 	// refreshTokenTTL int    `yaml:"refresh_tokenTTL"`
 
-	tokenManager, err := jwt.NewManager(conf.JWTSecret, time.Duration(conf.AccessTokenTTL), time.Duration(conf.RefreshTokenTTL))
+	tokenManager, err := jwt.NewManager(conf.JWTSecret, time.Duration(conf.AccessTokenTTL)*time.Minute, time.Duration(conf.RefreshTokenTTL)*time.Minute)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
 	// initializing server
 	repo := auth.NewRepository(client, logger)
-	service := auth.NewService(repo, tokenManager, storeRedis, logger, time.Duration(conf.AccessTokenTTL), time.Duration(conf.RefreshTokenTTL))
-	h := auth.NewHandler(service, logger)
+	service := auth.NewService(repo, tokenManager, storeRedis, logger,
+		time.Duration(conf.AccessTokenTTL)*time.Minute,
+		time.Duration(conf.RefreshTokenTTL)*time.Minute)
+
+	h := auth.NewHandler(service, tokenManager, logger)
 
 	router := mux.NewRouter()
 
