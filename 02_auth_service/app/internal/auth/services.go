@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -14,6 +15,7 @@ type Service interface {
 	CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID string, err error)
 	Login(ctx context.Context, loginUser LoginUserDTO) (*jwt.Tokens, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (jwt.Tokens, error)
+	DeleteUser(ctx context.Context, uuid string) (string, error)
 }
 
 type service struct {
@@ -66,6 +68,8 @@ func (s *service) CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID s
 	return userUUID, nil
 }
 
+var ErrUserExitst = errors.New("user already exists")
+
 func (s *service) Login(ctx context.Context, loginUser LoginUserDTO) (*jwt.Tokens, error) {
 
 	lgUser := LoginUser(loginUser)
@@ -73,7 +77,7 @@ func (s *service) Login(ctx context.Context, loginUser LoginUserDTO) (*jwt.Token
 	user, err := s.storage.GetByEmail(ctx, lgUser.Email)
 
 	if err != nil {
-		return nil, err
+		return nil, ErrUserExitst
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(lgUser.Password)); err != nil {
@@ -130,4 +134,16 @@ func (s *service) RefreshTokens(ctx context.Context, refreshToken string) (jwt.T
 	}
 
 	return newTokens, nil
+}
+
+func (s *service) DeleteUser(ctx context.Context, uuid string) (string, error) {
+
+	deletedUser, err := s.storage.DeleteUser(ctx, uuid)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	return deletedUser, nil
+
 }

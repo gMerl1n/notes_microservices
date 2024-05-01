@@ -27,7 +27,8 @@ func NewHandler(services Service, tokenManager jwt.TokenManager, logger *slog.Lo
 func (h *Handler) RegisterHandlers(router *mux.Router) {
 	router.HandleFunc("/api/auth/createuser", h.CreateUser).Methods("Post")
 	router.HandleFunc("/api/auth/user", h.Login).Methods("Get")
-	router.HandleFunc("/api/auth/refresh_tokens", h.AuthMiddleware(h.RefreshTokens)).Methods("Get")
+	router.HandleFunc("/api/auth/refresh_tokens", h.RefreshTokens).Methods("Get")
+	router.HandleFunc("/api/auth/delete_user", h.AuthMiddleware(h.DeleteUser)).Methods("Delete")
 }
 
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -112,5 +113,26 @@ func (h *Handler) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(tokenBytes)
+
+}
+
+func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	UserUUID := r.Context().Value("UserUUID").(string)
+
+	deletedUserUUID, err := h.services.DeleteUser(r.Context(), UserUUID)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	resp, err := json.Marshal(deletedUserUUID)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
 
 }
