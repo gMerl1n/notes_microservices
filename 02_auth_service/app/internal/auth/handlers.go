@@ -24,6 +24,7 @@ func NewHandler(services Service, logger *slog.Logger) *Handler {
 func (h *Handler) RegisterHandlers(router *mux.Router) {
 	router.HandleFunc("/api/auth/createuser", h.CreateUser).Methods("Post")
 	router.HandleFunc("/api/auth/user", h.Login).Methods("Get")
+	router.HandleFunc("/api/auth/refresh_tokens", h.RefreshTokens).Methods("Get")
 }
 
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -69,27 +70,39 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(loginUser.Email, loginUser.Password)
 
-	user, err := h.services.GetByEmailAndPassword(r.Context(), loginUser)
+	tokens, err := h.services.Login(r.Context(), loginUser)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	// token, err := h.tokenManager.NewJWT(user.UUID)
-	// if err != nil {
-	// 	fmt.Println(err.Error())
-	// }
+	tokenBytes, err := json.Marshal(tokens)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
-	// refreshToken, err := h.tokenManager.NewRefreshToken()
-	// if err != nil {
-	// 	fmt.Println(err.Error())
-	// }
+	w.WriteHeader(http.StatusOK)
+	w.Write(tokenBytes)
 
-	// res := jwt.Tokens{
-	// 	AccessToken:  token,
-	// 	RefreshToken: refreshToken,
-	// }
+}
 
-	tokenBytes, err := json.Marshal(user)
+func (h *Handler) RefreshTokens(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var token RefreshTokensInput
+
+	defer r.Body.Close()
+	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	newTokens, err := h.services.RefreshTokens(r.Context(), token.Token)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	tokenBytes, err := json.Marshal(newTokens)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

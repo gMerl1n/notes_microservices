@@ -67,14 +67,17 @@ func main() {
 
 	// initializing tokenManager to generate JWT
 
-	tokenManager, err := jwt.NewManager(conf.JWTSecret, time.Duration(conf.TokenTTL)*time.Minute)
+	// accessTokenTTL  int    `yaml:"access_tokenTTL"`
+	// refreshTokenTTL int    `yaml:"refresh_tokenTTL"`
+
+	tokenManager, err := jwt.NewManager(conf.JWTSecret, time.Duration(conf.AccessTokenTTL), time.Duration(conf.RefreshTokenTTL))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
 	// initializing server
 	repo := auth.NewRepository(client, logger)
-	service := auth.NewService(repo, tokenManager, storeRedis, logger)
+	service := auth.NewService(repo, tokenManager, storeRedis, logger, time.Duration(conf.AccessTokenTTL), time.Duration(conf.RefreshTokenTTL))
 	h := auth.NewHandler(service, logger)
 
 	router := mux.NewRouter()

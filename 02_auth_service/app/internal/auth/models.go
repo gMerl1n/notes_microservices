@@ -39,14 +39,6 @@ func LoginUser(dto LoginUserDTO) User {
 	}
 }
 
-// func (u *User) CheckPassword(password string) error {
-// 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
-// 	if err != nil {
-// 		return fmt.Errorf("password does not match")
-// 	}
-// 	return nil
-// }
-
 func (u *User) GeneratePasswordHash() error {
 	pwd, err := generatePasswordHash(u.Password)
 	if err != nil {
@@ -63,3 +55,15 @@ func generatePasswordHash(password string) (string, error) {
 	}
 	return string(hash), nil
 }
+
+type RefreshTokensInput struct {
+	Token string
+}
+
+// func (u *User) CheckPassword(password string) error {
+// 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+// 	if err != nil {
+// 		return fmt.Errorf("password does not match")
+// 	}
+// 	return nil
+// }

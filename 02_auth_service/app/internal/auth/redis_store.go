@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -10,14 +9,14 @@ import (
 )
 
 type Session struct {
-	RefreshToken string
-	ExpiresAt    time.Time
+	UserUUID  string
+	ExpiresAt time.Time
 }
 
 type RedisStorage interface {
-	SetSession(ctx context.Context, SID string, sess Session, lifetime time.Duration) error
-	GetSession(ctx context.Context, SID string) (string, error)
-	DeleteSession(ctx context.Context, SID string) error
+	SetSession(ctx context.Context, RefreshToken string, sess Session) error
+	GetSession(ctx context.Context, RefreshToken string) (Session, error)
+	DeleteSession(ctx context.Context, RefreshToken string) error
 }
 
 type RedisRepo struct {
@@ -28,30 +27,40 @@ func NewRedisStore(client *redis.Client) *RedisRepo {
 	return &RedisRepo{client: client}
 }
 
-func (r *RedisRepo) SetSession(ctx context.Context, SID string, sess Session, lifetime time.Duration) error {
-	tokenBytes, err := json.Marshal(sess)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	if err := r.client.Set(ctx, SID, tokenBytes, lifetime).Err(); err != nil {
+func (r *RedisRepo) SetSession(ctx context.Context, RefreshToken string, sess Session) error {
+	if err := r.client.HMSet(ctx, RefreshToken, "UserUUID", sess.UserUUID, "ExpiresAt", sess.ExpiresAt).Err(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *RedisRepo) GetSession(ctx context.Context, SID string) (string, error) {
-	val, err := r.client.Get(ctx, SID).Result()
+func (r *RedisRepo) GetSession(ctx context.Context, RefreshToken string) (Session, error) {
+
+	sess := Session{}
+
+	sessByRToken, err := r.client.HGetAll(ctx, RefreshToken).Result()
 	if err != nil {
-		return "", err
+		return sess, err
 	}
 
-	return val, nil
+	//fmt.Println(sessByRToken["ExpiresAt"])
+
+	sess.UserUUID = sessByRToken["UserUUID"]
+	// sess.ExpiresAt, err = time.Parse(time.RFC1123, sessByRToken["ExpiresAt"])
+	// if err != nil {
+	// 	fmt.Println(err.Error())
+	// }
+
+	return sess, nil
 }
 
-func (r *RedisRepo) DeleteSession(ctx context.Context, SID string) error {
-	err := r.client.Del(ctx, SID).Err()
+func (r *RedisRepo) DeleteSession(ctx context.Context, RefreshToken string) error {
+	fmt.Println("DeleteSession")
+	err := r.client.Del(ctx, RefreshToken).Err()
 	if err != nil {
+		fmt.Println(err.Error())
 		return err
 	}
+
 	return nil
 }

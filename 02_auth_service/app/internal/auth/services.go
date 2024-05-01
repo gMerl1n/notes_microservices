@@ -12,7 +12,8 @@ import (
 
 type Service interface {
 	CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID string, err error)
-	GetByEmailAndPassword(ctx context.Context, loginUser LoginUserDTO) (*User, error)
+	Login(ctx context.Context, loginUser LoginUserDTO) (*jwt.Tokens, error)
+	RefreshTokens(ctx context.Context, refreshToken string) (jwt.Tokens, error)
 }
 
 // type StoreRedis interface {
@@ -21,14 +22,28 @@ type Service interface {
 
 type service struct {
 	// создаем структуру, которая принимает репозиторий для работы с БД
-	storage      Storage
-	tokenManager jwt.TokenManager
-	redis        RedisStorage
-	logger       *slog.Logger
+	storage         Storage
+	tokenManager    jwt.TokenManager
+	redis           RedisStorage
+	logger          *slog.Logger
+	accessTokenTTL  time.Duration
+	refreshTokenTTL time.Duration
 }
 
-func NewService(repo *Repository, tokenManager jwt.TokenManager, redis *RedisRepo, log *slog.Logger) *service {
-	return &service{storage: repo, tokenManager: tokenManager, redis: redis, logger: log}
+func NewService(
+	repo *Repository,
+	tokenManager jwt.TokenManager,
+	redis *RedisRepo, log *slog.Logger,
+	accessTokenTTL time.Duration,
+	refreshTokenTTL time.Duration) *service {
+
+	return &service{
+		storage:         repo,
+		tokenManager:    tokenManager,
+		redis:           redis,
+		logger:          log,
+		accessTokenTTL:  accessTokenTTL,
+		refreshTokenTTL: refreshTokenTTL}
 }
 
 func (s *service) CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID string, err error) {
@@ -55,7 +70,7 @@ func (s *service) CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID s
 	return userUUID, nil
 }
 
-func (s *service) GetByEmailAndPassword(ctx context.Context, loginUser LoginUserDTO) (*User, error) {
+func (s *service) Login(ctx context.Context, loginUser LoginUserDTO) (*jwt.Tokens, error) {
 
 	lgUser := LoginUser(loginUser)
 
@@ -64,8 +79,6 @@ func (s *service) GetByEmailAndPassword(ctx context.Context, loginUser LoginUser
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(user)
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(lgUser.Password)); err != nil {
 		return nil, err
@@ -76,9 +89,7 @@ func (s *service) GetByEmailAndPassword(ctx context.Context, loginUser LoginUser
 		fmt.Println(err)
 	}
 
-	fmt.Println(tokens)
-
-	return user, nil
+	return &tokens, nil
 }
 
 func (s *service) createSession(ctx context.Context, userUUID string) (jwt.Tokens, error) {
@@ -97,15 +108,30 @@ func (s *service) createSession(ctx context.Context, userUUID string) (jwt.Token
 	if err != nil {
 		return res, err
 	}
-
 	session := Session{
-		RefreshToken: res.RefreshToken,
-		ExpiresAt:    time.Now().Add(10 * time.Minute),
+		UserUUID:  userUUID,
+		ExpiresAt: time.Now().Add(s.refreshTokenTTL),
 	}
 
-	fmt.Println("session", session)
-
-	err = s.redis.SetSession(ctx, userUUID, session, 60*time.Minute)
+	err = s.redis.SetSession(ctx, res.RefreshToken, session)
 
 	return res, err
+}
+
+func (s *service) RefreshTokens(ctx context.Context, refreshToken string) (jwt.Tokens, error) {
+
+	sessByRToken, err := s.redis.GetSession(ctx, refreshToken)
+	if err != nil {
+		fmt.Println(" s.redis.GetSession(ctx, refreshToken)", err.Error())
+	}
+
+	s.redis.DeleteSession(ctx, refreshToken)
+
+	newTokens, err := s.createSession(ctx, sessByRToken.UserUUID)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	return newTokens, nil
 }

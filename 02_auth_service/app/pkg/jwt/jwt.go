@@ -22,22 +22,26 @@ type TokenManager interface {
 }
 
 type Manager struct {
-	signingKey string
-	timeTTL    time.Duration
+	signingKey      string
+	accessTokenTTL  time.Duration
+	refreshTokenTTL time.Duration
 }
 
-func NewManager(signingKey string, timeTTL time.Duration) (*Manager, error) {
+func NewManager(signingKey string, accessTokenTTL time.Duration, refreshTokenTTL time.Duration) (*Manager, error) {
 	if signingKey == "" {
 		return nil, errors.New("empty signing key")
 	}
 
-	return &Manager{signingKey: signingKey, timeTTL: timeTTL}, nil
+	return &Manager{
+		signingKey:      signingKey,
+		accessTokenTTL:  accessTokenTTL,
+		refreshTokenTTL: refreshTokenTTL}, nil
 }
 
-func (m *Manager) NewJWT(userId string) (string, error) {
+func (m *Manager) NewJWT(userUUID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(m.timeTTL).Unix(),
-		Subject:   userId,
+		ExpiresAt: time.Now().Add(m.accessTokenTTL).Unix(),
+		Subject:   userUUID,
 	})
 
 	return token.SignedString([]byte(m.signingKey))
