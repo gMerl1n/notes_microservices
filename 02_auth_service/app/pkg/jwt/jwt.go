@@ -9,7 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-type TokenResponse struct {
+type Tokens struct {
 	AccessToken  string
 	RefreshToken string
 }

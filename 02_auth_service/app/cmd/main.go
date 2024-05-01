@@ -15,7 +15,7 @@ import (
 	"github.com/iriskin77/notes_microservices/app/pkg/db"
 	"github.com/iriskin77/notes_microservices/app/pkg/jwt"
 	"github.com/iriskin77/notes_microservices/app/pkg/logging"
-	"github.com/iriskin77/notes_microservices/app/pkg/redis"
+	"github.com/iriskin77/notes_microservices/app/pkg/redis_client"
 	"github.com/joho/godotenv"
 )
 
@@ -52,18 +52,18 @@ func main() {
 
 	i, _ := strconv.Atoi(os.Getenv("REDIS_DB"))
 
-	redisConfig := redis.NewRedisConfig(
+	redisConfig := redis_client.NewRedisConfig(
 		os.Getenv("REDIS_PORT"),
 		os.Getenv("REDIS_PASSWORD"),
 		i,
 	)
 
-	clientRedis, err := redis.NewRedisClient(redisConfig)
+	clientRedis, err := redis_client.NewRedisClient(redisConfig)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	fmt.Println(clientRedis)
+	storeRedis := auth.NewRedisStore(clientRedis)
 
 	// initializing tokenManager to generate JWT
 
@@ -74,8 +74,8 @@ func main() {
 
 	// initializing server
 	repo := auth.NewRepository(client, logger)
-	service := auth.NewService(repo, logger)
-	h := auth.NewHandler(service, tokenManager, logger)
+	service := auth.NewService(repo, tokenManager, storeRedis, logger)
+	h := auth.NewHandler(service, logger)
 
 	router := mux.NewRouter()
 

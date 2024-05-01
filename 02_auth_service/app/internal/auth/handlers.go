@@ -7,20 +7,17 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/iriskin77/notes_microservices/app/pkg/jwt"
 )
 
 type Handler struct {
-	services     Service
-	tokenManager jwt.TokenManager
-	logger       *slog.Logger
+	services Service
+	logger   *slog.Logger
 }
 
-func NewHandler(services Service, tokenManager jwt.TokenManager, logger *slog.Logger) *Handler {
+func NewHandler(services Service, logger *slog.Logger) *Handler {
 	return &Handler{
-		services:     services,
-		tokenManager: tokenManager,
-		logger:       logger,
+		services: services,
+		logger:   logger,
 	}
 }
 
@@ -77,22 +74,22 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err.Error())
 	}
 
-	token, err := h.tokenManager.NewJWT(user.UUID)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	// token, err := h.tokenManager.NewJWT(user.UUID)
+	// if err != nil {
+	// 	fmt.Println(err.Error())
+	// }
 
-	refreshToken, err := h.tokenManager.NewRefreshToken()
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	// refreshToken, err := h.tokenManager.NewRefreshToken()
+	// if err != nil {
+	// 	fmt.Println(err.Error())
+	// }
 
-	res := jwt.TokenResponse{
-		AccessToken:  token,
-		RefreshToken: refreshToken,
-	}
+	// res := jwt.Tokens{
+	// 	AccessToken:  token,
+	// 	RefreshToken: refreshToken,
+	// }
 
-	tokenBytes, err := json.Marshal(res)
+	tokenBytes, err := json.Marshal(user)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

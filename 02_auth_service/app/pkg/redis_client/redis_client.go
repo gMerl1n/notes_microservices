@@ -1,4 +1,4 @@
-package redis
+package redis_client
 
 import (
 	"context"
@@ -9,10 +9,10 @@ import (
 type ConfigRedis struct {
 	addrRedis     string
 	passwordRedis string
-	dbRedis       string
+	dbRedis       int
 }
 
-func NewRedisConfig(addrRedis string, passwordRedis string, dbRedis string) *ConfigRedis {
+func NewRedisConfig(addrRedis string, passwordRedis string, dbRedis int) *ConfigRedis {
 	return &ConfigRedis{
 		addrRedis:     addrRedis,
 		passwordRedis: passwordRedis,
