@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package notes;
+
+
+service Note {
+    rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse);
+    rpc GetNote (GetNoteRequest) returns (GetNoteReponse);
+    rpc GetNotes (GetNotesRequest) returns (GetNotesReponse);
+    rpc DeleteNote (DeleteNoteRequest) returns (DeleteNoteReponse);
+}
+
+message CreateNoteRequest {
+    string userUUID = 1; // Email of the user to register
+    string title = 2; // Password of the user to register
+    string body = 2; // Password of the user to register
+}
+
+message CreateNoteResponse {
+    string noteUUID = 1; // Email of the user to register
+}
+
+message GetNoteRequest {
+    string noteUUID = 1; // Email of the user to register
+}
+
+message GetNoteReponse {
+    string noteUUID = 1; // Email of the user to register
+    string title = 2; // Password of the user to register
+    string body = 3; // Password of the user to register
+    optional float update_at = 4;      
+    float created_at = 5;   
+}
