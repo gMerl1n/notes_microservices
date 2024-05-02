@@ -2,20 +2,18 @@ package auth
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"log/slog"
 	"time"
 
 	"github.com/iriskin77/notes_microservices/app/pkg/jwt"
+	"github.com/iriskin77/notes_microservices/app/pkg/logging"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
 	CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID string, err error)
 	Login(ctx context.Context, loginUser LoginUserDTO) (*jwt.Tokens, error)
-	RefreshTokens(ctx context.Context, refreshToken string) (jwt.Tokens, error)
-	DeleteUser(ctx context.Context, uuid string) (string, error)
+	RefreshTokens(ctx context.Context, refreshToken string) (*jwt.Tokens, error)
 }
 
 type service struct {
@@ -23,7 +21,7 @@ type service struct {
 	storage         Storage
 	tokenManager    jwt.TokenManager
 	redis           RedisStorage
-	logger          *slog.Logger
+	logger          *logging.Logger
 	accessTokenTTL  time.Duration
 	refreshTokenTTL time.Duration
 }
@@ -31,7 +29,7 @@ type service struct {
 func NewService(
 	repo *Repository,
 	tokenManager jwt.TokenManager,
-	redis *RedisRepo, log *slog.Logger,
+	redis *RedisRepo, log *logging.Logger,
 	accessTokenTTL time.Duration,
 	refreshTokenTTL time.Duration) *service {
 
@@ -47,7 +45,7 @@ func NewService(
 func (s *service) CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID string, err error) {
 	s.logger.Debug("check password and repeat password")
 	if dto.Password != dto.RepeatPassword {
-		fmt.Println(err.Error())
+		return "", fmt.Errorf("password does not match repeat password")
 	}
 
 	user := NewUser(dto)
@@ -55,38 +53,39 @@ func (s *service) CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID s
 	s.logger.Debug("generate password hash")
 	err = user.GeneratePasswordHash()
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		s.logger.Error("failed to generate hashed pass: %w", err)
+		return "", fmt.Errorf("internal server error")
 	}
 
 	userUUID, err = s.storage.CreateUser(ctx, user)
 
 	if err != nil {
-		fmt.Println(err.Error())
+		s.logger.Error("failed to create user: %w", err)
+		return "", fmt.Errorf("internal server error")
 	}
 
 	return userUUID, nil
 }
-
-var ErrUserExitst = errors.New("user already exists")
 
 func (s *service) Login(ctx context.Context, loginUser LoginUserDTO) (*jwt.Tokens, error) {
 
 	lgUser := LoginUser(loginUser)
 
 	user, err := s.storage.GetByEmail(ctx, lgUser.Email)
-
 	if err != nil {
-		return nil, ErrUserExitst
+		s.logger.Error("Failed to user by email %w", err)
+		return nil, fmt.Errorf("invalid email or password")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(lgUser.Password)); err != nil {
-		return nil, err
+		s.logger.Error("Failed to compare password and repeated password %w", err)
+		return nil, fmt.Errorf("password does not match repeated password")
 	}
 
 	tokens, err := s.createSession(ctx, user.UUID)
 	if err != nil {
-		fmt.Println(err)
+		s.logger.Error("Failed to create session %w", err)
+		return nil, fmt.Errorf("internal server error")
 	}
 
 	return &tokens, nil
@@ -118,32 +117,26 @@ func (s *service) createSession(ctx context.Context, userUUID string) (jwt.Token
 	return res, err
 }
 
-func (s *service) RefreshTokens(ctx context.Context, refreshToken string) (jwt.Tokens, error) {
+func (s *service) RefreshTokens(ctx context.Context, refreshToken string) (*jwt.Tokens, error) {
 
 	sessByRToken, err := s.redis.GetSession(ctx, refreshToken)
 	if err != nil {
-		fmt.Println(" s.redis.GetSession(ctx, refreshToken)", err.Error())
+		s.logger.Error("failed to get session by refresh token %w", err)
+		return nil, err
 	}
 
-	s.redis.DeleteSession(ctx, refreshToken)
+	ok := s.redis.DeleteSession(ctx, refreshToken)
+
+	if ok != nil {
+		s.logger.Warn("failed to delete session by refresh token %w", err)
+	}
 
 	newTokens, err := s.createSession(ctx, sessByRToken.UserUUID)
 
 	if err != nil {
-		fmt.Println(err.Error())
+		s.logger.Error("failed to create session with new refresh token %w", err)
+		return nil, err
 	}
 
-	return newTokens, nil
-}
-
-func (s *service) DeleteUser(ctx context.Context, uuid string) (string, error) {
-
-	deletedUser, err := s.storage.DeleteUser(ctx, uuid)
-
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	return deletedUser, nil
-
+	return &newTokens, nil
 }

@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -28,7 +27,7 @@ func NewRedisStore(client *redis.Client) *RedisRepo {
 }
 
 func (r *RedisRepo) SetSession(ctx context.Context, RefreshToken string, sess Session) error {
-	if err := r.client.HMSet(ctx, RefreshToken, "UserUUID", sess.UserUUID, "ExpiresAt", sess.ExpiresAt).Err(); err != nil {
+	if err := r.client.HSet(ctx, RefreshToken, "UserUUID", sess.UserUUID, "ExpiresAt", sess.ExpiresAt).Err(); err != nil {
 		return err
 	}
 	return nil
@@ -43,24 +42,17 @@ func (r *RedisRepo) GetSession(ctx context.Context, RefreshToken string) (Sessio
 		return sess, err
 	}
 
-	//fmt.Println(sessByRToken["ExpiresAt"])
-
 	sess.UserUUID = sessByRToken["UserUUID"]
-	// sess.ExpiresAt, err = time.Parse(time.RFC1123, sessByRToken["ExpiresAt"])
-	// if err != nil {
-	// 	fmt.Println(err.Error())
-	// }
 
 	return sess, nil
 }
 
 func (r *RedisRepo) DeleteSession(ctx context.Context, RefreshToken string) error {
-	fmt.Println("DeleteSession")
 	err := r.client.Del(ctx, RefreshToken).Err()
 	if err != nil {
-		fmt.Println(err.Error())
 		return err
 	}
 
 	return nil
+
 }

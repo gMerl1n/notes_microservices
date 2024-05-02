@@ -10,10 +10,18 @@ import (
 	//"github.com/iriskin77/notes_microservices/app/pkg/jwt"
 )
 
+type userCtx string
+
+const (
+	// for AuthMiddleware
+	AuthorizationHeader         = "Authorization"
+	UserContextKey      userCtx = "UserUUID"
+)
+
 func (h *Handler) AuthMiddleware(hf http.HandlerFunc) http.HandlerFunc {
 	return func(response http.ResponseWriter, request *http.Request) {
 
-		header := request.Header.Get("Authorization")
+		header := request.Header.Get(AuthorizationHeader)
 
 		headerParts := strings.Split(header, " ")
 
@@ -27,7 +35,7 @@ func (h *Handler) AuthMiddleware(hf http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		userId, err := h.tokenManager.Parse(headerParts[1])
+		userUUID, err := h.tokenManager.Parse(headerParts[1])
 		if err != nil {
 			fmt.Println("ParseToken", err.Error())
 			return
@@ -35,7 +43,7 @@ func (h *Handler) AuthMiddleware(hf http.HandlerFunc) http.HandlerFunc {
 
 		//fmt.Println(AuthMiddleware, userId)
 
-		ctx := context.WithValue(request.Context(), "UserUUID", userId)
+		ctx := context.WithValue(request.Context(), UserContextKey, userUUID)
 		request = request.WithContext(ctx)
 
 		hf(response, request)

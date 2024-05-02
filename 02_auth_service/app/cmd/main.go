@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -21,15 +20,19 @@ import (
 
 func main() {
 
-	if err := godotenv.Load(); err != nil {
-		fmt.Println(err.Error())
-	}
-
 	// initializing config
 	conf := config.LoadConfig()
 
 	// initializing logger
-	logger := logging.SetupLogger(conf.Env)
+	logging.Init()
+	logger := logging.GetLogger()
+	logger.Println("logger initialized")
+
+	// load .env variables
+
+	if err := godotenv.Load(); err != nil {
+		logger.Fatal(err)
+	}
 
 	// initializin db
 	confDB := db.NewPostgresConfig(
@@ -45,7 +48,7 @@ func main() {
 	client, err := db.NewPostgresDB(ctx, confDB)
 
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Fatal(err)
 	}
 
 	// initializing Redis
@@ -60,7 +63,7 @@ func main() {
 
 	clientRedis, err := redis_client.NewRedisClient(redisConfig)
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Fatal(err)
 	}
 
 	storeRedis := auth.NewRedisStore(clientRedis)
@@ -72,16 +75,16 @@ func main() {
 
 	tokenManager, err := jwt.NewManager(conf.JWTSecret, time.Duration(conf.AccessTokenTTL)*time.Minute, time.Duration(conf.RefreshTokenTTL)*time.Minute)
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Fatal(err)
 	}
 
 	// initializing server
-	repo := auth.NewRepository(client, logger)
-	service := auth.NewService(repo, tokenManager, storeRedis, logger,
+	repo := auth.NewRepository(client, &logger)
+	service := auth.NewService(repo, tokenManager, storeRedis, &logger,
 		time.Duration(conf.AccessTokenTTL)*time.Minute,
 		time.Duration(conf.RefreshTokenTTL)*time.Minute)
 
-	h := auth.NewHandler(service, tokenManager, logger)
+	h := auth.NewHandler(service, tokenManager, &logger)
 
 	router := mux.NewRouter()
 
@@ -89,16 +92,12 @@ func main() {
 
 	//srv, err := server.NewHttpServer(conf.Port)
 
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
 	logger.Info("starting application", slog.String("env", conf.Env), slog.Any("cfg", conf))
 
 	srv, err := NewHttpServer(router, conf)
 
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Fatal(err)
 	}
 
 	srv.ListenAndServe()

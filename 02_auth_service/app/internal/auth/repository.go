@@ -3,8 +3,8 @@ package auth
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
+	"github.com/iriskin77/notes_microservices/app/pkg/logging"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -18,15 +18,14 @@ const (
 type Storage interface {
 	CreateUser(ctx context.Context, user User) (string, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
-	DeleteUser(ctx context.Context, uuid string) (string, error)
 }
 
 type Repository struct {
 	db     *pgxpool.Pool
-	logger *slog.Logger
+	logger *logging.Logger
 }
 
-func NewRepository(db *pgxpool.Pool, logger *slog.Logger) *Repository {
+func NewRepository(db *pgxpool.Pool, logger *logging.Logger) *Repository {
 	return &Repository{db: db, logger: logger}
 }
 
@@ -63,20 +62,4 @@ func (s *Repository) GetByEmail(ctx context.Context, email string) (*User, error
 
 	return &user, nil
 
-}
-
-func (s *Repository) DeleteUser(ctx context.Context, uuid string) (string, error) {
-
-	var deletedUserUUID string
-
-	query := fmt.Sprintf("DELETE FROM %s WHERE UUID=$1 RETURNING UUID", usersTable)
-
-	if err := s.db.QueryRow(ctx, query,
-		uuid,
-	).Scan(&deletedUserUUID); err != nil {
-		fmt.Println(err.Error())
-		return "", err
-	}
-
-	return deletedUserUUID, nil
 }

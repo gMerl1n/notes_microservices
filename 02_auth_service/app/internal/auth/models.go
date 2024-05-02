@@ -8,15 +8,15 @@ import (
 )
 
 type User struct {
-	UUID     string
-	Email    string
-	Password string
+	UUID     string `json:"UUID,omitempty"`
+	Email    string `json:"Email,omitempty"`
+	Password string `json:"Password,omitempty"`
 }
 
 type CreateUserDTO struct {
-	Email          string
-	Password       string
-	RepeatPassword string
+	Email          string `json:"Email,omitempty"`
+	Password       string `json:"Password,omitempty"`
+	RepeatPassword string `json:"RepeatPassword,omitempty"`
 }
 
 func NewUser(dto CreateUserDTO) User {
