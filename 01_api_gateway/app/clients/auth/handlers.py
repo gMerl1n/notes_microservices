@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
+from app.clients.auth.service import get_userUUID_from_token
 from app.settings import settings
 import requests
 import json
@@ -18,3 +19,12 @@ async def login():
         raise HTTPException(status_code=500, detail="Internal server error")
 
     return JSONResponse({"token": auth_token.json()})
+
+
+
+@router_auth.get("/")
+async def test_for_auth(userUUID = Depends(get_userUUID_from_token)):
+
+    """Получить информацию о пользователе по его id"""
+
+    return JSONResponse({"userUUID": userUUID})
