@@ -22,18 +22,18 @@ func NewAppError(message string, code int, developerMessage string) *AppError {
 	}
 }
 
-func BadRequestError(w http.ResponseWriter, message string, code int) {
-	errorMessage := NewAppError(message, code, message)
+func BadRequestError(w http.ResponseWriter, message string, code int, developerMessage string) {
+	errorMessage := NewAppError(message, code, developerMessage)
 
 	SendErrorResponse(w, errorMessage)
 }
 
-func SendErrorResponse(response http.ResponseWriter, message *AppError) {
+func SendErrorResponse(w http.ResponseWriter, message *AppError) {
 	responseJSON, err := json.Marshal(message)
 	if err != nil {
-		http.Error(response, "Failed to marshal JSON", http.StatusInternalServerError)
+		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
 	}
 
-	response.Header().Set("Content-Type", "application/json")
-	response.Write(responseJSON)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseJSON)
 }

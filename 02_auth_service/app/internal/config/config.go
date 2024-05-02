@@ -17,8 +17,6 @@ type Config struct {
 	RefreshTokenTTL int    `yaml:"refresh_tokenTTL"`
 }
 
-// access_tokenTTL: 120m
-// refresh_tokenTTL: 43200m #30 days
 func LoadConfig() *Config {
 	path := fetchConfigPath()
 	if path == "" {

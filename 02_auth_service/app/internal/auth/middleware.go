@@ -5,16 +5,13 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	//"github.com/cristalhq/jwt"
-	//"github.com/iriskin77/notes_microservices/app/internal/auth"
-	//"github.com/iriskin77/notes_microservices/app/pkg/jwt"
 )
 
 type userCtx string
 
 const (
 	// for AuthMiddleware
-	AuthorizationHeader         = "Authorization"
+	AuthorizationHeader string  = "Authorization"
 	UserContextKey      userCtx = "UserUUID"
 )
 

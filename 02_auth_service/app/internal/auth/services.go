@@ -54,14 +54,14 @@ func (s *service) CreateUser(ctx context.Context, dto CreateUserDTO) (userUUID s
 	err = user.GeneratePasswordHash()
 	if err != nil {
 		s.logger.Error("failed to generate hashed pass: %w", err)
-		return "", fmt.Errorf("internal server error")
+		return "", err
 	}
 
 	userUUID, err = s.storage.CreateUser(ctx, user)
 
 	if err != nil {
 		s.logger.Error("failed to create user: %w", err)
-		return "", fmt.Errorf("internal server error")
+		return "", err
 	}
 
 	return userUUID, nil
@@ -73,19 +73,19 @@ func (s *service) Login(ctx context.Context, loginUser LoginUserDTO) (*jwt.Token
 
 	user, err := s.storage.GetByEmail(ctx, lgUser.Email)
 	if err != nil {
-		s.logger.Error("Failed to user by email %w", err)
-		return nil, fmt.Errorf("invalid email or password")
+		s.logger.Error("Failed to user by email", err)
+		return nil, err
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(lgUser.Password)); err != nil {
-		s.logger.Error("Failed to compare password and repeated password %w", err)
-		return nil, fmt.Errorf("password does not match repeated password")
+		s.logger.Error("Failed to compare password and repeated password", err)
+		return nil, err
 	}
 
 	tokens, err := s.createSession(ctx, user.UUID)
 	if err != nil {
 		s.logger.Error("Failed to create session %w", err)
-		return nil, fmt.Errorf("internal server error")
+		return nil, err
 	}
 
 	return &tokens, nil
