@@ -1,10 +1,11 @@
+import uuid
 from typing import List, Optional
 from pydantic import BaseModel
 
 
 class Category(BaseModel):
 
-    name_category: str
+    category_name: str
 
 
 class Categories(BaseModel):
@@ -14,13 +15,17 @@ class Categories(BaseModel):
 
 class Note(BaseModel):
 
-    note_uuid: str
-    category_id: Optional[int]
+    user_uuid: uuid.UUID
+    category_id: Optional[int] = None
     title: str
     body: str
-    update_at: Optional[float]
-    created_at: float
+    update_at: Optional[float] = None
+    created_at: Optional[float] = None
 
+
+# class NoteResponse(BaseModel):
+
+#     note_uuid: str
 
 class ListNotes(BaseModel):
 
