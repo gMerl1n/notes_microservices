@@ -5,41 +5,55 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class CreateCategoryRequest(_message.Message):
+    __slots__ = ("category_name",)
+    CATEGORY_NAME_FIELD_NUMBER: _ClassVar[int]
+    category_name: str
+    def __init__(self, category_name: _Optional[str] = ...) -> None: ...
+
+class CreateCategoryResponse(_message.Message):
+    __slots__ = ("category_id",)
+    CATEGORY_ID_FIELD_NUMBER: _ClassVar[int]
+    category_id: int
+    def __init__(self, category_id: _Optional[int] = ...) -> None: ...
+
 class CreateNoteRequest(_message.Message):
-    __slots__ = ("userUUID", "title", "body")
-    USERUUID_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("user_uuid", "category_id", "title", "body")
+    USER_UUID_FIELD_NUMBER: _ClassVar[int]
+    CATEGORY_ID_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     BODY_FIELD_NUMBER: _ClassVar[int]
-    userUUID: str
+    user_uuid: str
+    category_id: int
     title: str
     body: str
-    def __init__(self, userUUID: _Optional[str] = ..., title: _Optional[str] = ..., body: _Optional[str] = ...) -> None: ...
+    def __init__(self, user_uuid: _Optional[str] = ..., category_id: _Optional[int] = ..., title: _Optional[str] = ..., body: _Optional[str] = ...) -> None: ...
 
 class CreateNoteResponse(_message.Message):
-    __slots__ = ("noteUUID",)
-    NOTEUUID_FIELD_NUMBER: _ClassVar[int]
-    noteUUID: str
-    def __init__(self, noteUUID: _Optional[str] = ...) -> None: ...
+    __slots__ = ("note_uuid",)
+    NOTE_UUID_FIELD_NUMBER: _ClassVar[int]
+    note_uuid: str
+    def __init__(self, note_uuid: _Optional[str] = ...) -> None: ...
 
 class GetNoteRequest(_message.Message):
-    __slots__ = ("noteUUID",)
-    NOTEUUID_FIELD_NUMBER: _ClassVar[int]
-    noteUUID: str
-    def __init__(self, noteUUID: _Optional[str] = ...) -> None: ...
+    __slots__ = ("note_uuid",)
+    NOTE_UUID_FIELD_NUMBER: _ClassVar[int]
+    note_uuid: str
+    def __init__(self, note_uuid: _Optional[str] = ...) -> None: ...
 
 class GetNoteResponse(_message.Message):
-    __slots__ = ("noteUUID", "title", "body", "update_at", "created_at")
-    NOTEUUID_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("note_uuid", "title", "body", "update_at", "created_at")
+    NOTE_UUID_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     BODY_FIELD_NUMBER: _ClassVar[int]
     UPDATE_AT_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
-    noteUUID: str
+    note_uuid: str
     title: str
     body: str
     update_at: float
     created_at: float
-    def __init__(self, noteUUID: _Optional[str] = ..., title: _Optional[str] = ..., body: _Optional[str] = ..., update_at: _Optional[float] = ..., created_at: _Optional[float] = ...) -> None: ...
+    def __init__(self, note_uuid: _Optional[str] = ..., title: _Optional[str] = ..., body: _Optional[str] = ..., update_at: _Optional[float] = ..., created_at: _Optional[float] = ...) -> None: ...
 
 class GetListNotesRequest(_message.Message):
     __slots__ = ()

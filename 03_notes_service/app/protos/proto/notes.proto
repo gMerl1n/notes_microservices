@@ -7,25 +7,35 @@ service Note {
     rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse);
     rpc GetNote (GetNoteRequest) returns (GetNoteResponse);
     rpc GetNotes (GetListNotesRequest) returns (GetListNotesResponse);
+    rpc CreateCategory (CreateCategoryRequest) returns (CreateCategoryResponse);
     // rpc DeleteNote (DeleteNoteRequest) returns (DeleteNoteReponse);
 }
 
+message CreateCategoryRequest {
+    string category_name = 1;
+}
+
+message CreateCategoryResponse {
+    int64 category_id = 1;
+}
+
 message CreateNoteRequest {
-    string userUUID = 1; // note id
-    string title = 2; // note title
-    string body = 3; // note body
+    string user_uuid = 1; // note id
+    optional int64 category_id = 2;
+    string title = 3; // note title
+    string body = 4; // note body
 }
 
 message CreateNoteResponse {
-    string noteUUID = 1; // note id
+    string note_uuid = 1; // note id
 }
 
 message GetNoteRequest {
-    string noteUUID = 1; // note id
+    string note_uuid = 1; // note id
 }
 
 message GetNoteResponse {
-    string noteUUID = 1; // note id
+    string note_uuid = 1; // note id
     string title = 2; // note title
     string body = 3; // note body
     optional float update_at = 4; // if the note was updated     

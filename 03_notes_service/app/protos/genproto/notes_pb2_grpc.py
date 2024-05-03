@@ -29,6 +29,11 @@ class NoteStub(object):
                 request_serializer=notes__pb2.GetListNotesRequest.SerializeToString,
                 response_deserializer=notes__pb2.GetListNotesResponse.FromString,
                 )
+        self.CreateCategory = channel.unary_unary(
+                '/notes.Note/CreateCategory',
+                request_serializer=notes__pb2.CreateCategoryRequest.SerializeToString,
+                response_deserializer=notes__pb2.CreateCategoryResponse.FromString,
+                )
 
 
 class NoteServicer(object):
@@ -47,6 +52,12 @@ class NoteServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetNotes(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CreateCategory(self, request, context):
         """rpc DeleteNote (DeleteNoteRequest) returns (DeleteNoteReponse);
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -70,6 +81,11 @@ def add_NoteServicer_to_server(servicer, server):
                     servicer.GetNotes,
                     request_deserializer=notes__pb2.GetListNotesRequest.FromString,
                     response_serializer=notes__pb2.GetListNotesResponse.SerializeToString,
+            ),
+            'CreateCategory': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateCategory,
+                    request_deserializer=notes__pb2.CreateCategoryRequest.FromString,
+                    response_serializer=notes__pb2.CreateCategoryResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -129,5 +145,22 @@ class Note(object):
         return grpc.experimental.unary_unary(request, target, '/notes.Note/GetNotes',
             notes__pb2.GetListNotesRequest.SerializeToString,
             notes__pb2.GetListNotesResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def CreateCategory(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/notes.Note/CreateCategory',
+            notes__pb2.CreateCategoryRequest.SerializeToString,
+            notes__pb2.CreateCategoryResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

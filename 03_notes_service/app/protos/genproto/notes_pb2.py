@@ -14,25 +14,29 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bnotes.proto\x12\x05notes\"B\n\x11\x43reateNoteRequest\x12\x10\n\x08userUUID\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0c\n\x04\x62ody\x18\x03 \x01(\t\"&\n\x12\x43reateNoteResponse\x12\x10\n\x08noteUUID\x18\x01 \x01(\t\"\"\n\x0eGetNoteRequest\x12\x10\n\x08noteUUID\x18\x01 \x01(\t\"z\n\x0fGetNoteResponse\x12\x10\n\x08noteUUID\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0c\n\x04\x62ody\x18\x03 \x01(\t\x12\x16\n\tupdate_at\x18\x04 \x01(\x02H\x00\x88\x01\x01\x12\x12\n\ncreated_at\x18\x05 \x01(\x02\x42\x0c\n\n_update_at\"\x15\n\x13GetListNotesRequest\"=\n\x14GetListNotesResponse\x12%\n\x05notes\x18\x01 \x03(\x0b\x32\x16.notes.GetNoteResponse2\xc8\x01\n\x04Note\x12\x41\n\nCreateNote\x12\x18.notes.CreateNoteRequest\x1a\x19.notes.CreateNoteResponse\x12\x38\n\x07GetNote\x12\x15.notes.GetNoteRequest\x1a\x16.notes.GetNoteResponse\x12\x43\n\x08GetNotes\x12\x1a.notes.GetListNotesRequest\x1a\x1b.notes.GetListNotesResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bnotes.proto\x12\x05notes\".\n\x15\x43reateCategoryRequest\x12\x15\n\rcategory_name\x18\x01 \x01(\t\"-\n\x16\x43reateCategoryResponse\x12\x13\n\x0b\x63\x61tegory_id\x18\x01 \x01(\x03\"m\n\x11\x43reateNoteRequest\x12\x11\n\tuser_uuid\x18\x01 \x01(\t\x12\x18\n\x0b\x63\x61tegory_id\x18\x02 \x01(\x03H\x00\x88\x01\x01\x12\r\n\x05title\x18\x03 \x01(\t\x12\x0c\n\x04\x62ody\x18\x04 \x01(\tB\x0e\n\x0c_category_id\"\'\n\x12\x43reateNoteResponse\x12\x11\n\tnote_uuid\x18\x01 \x01(\t\"#\n\x0eGetNoteRequest\x12\x11\n\tnote_uuid\x18\x01 \x01(\t\"{\n\x0fGetNoteResponse\x12\x11\n\tnote_uuid\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0c\n\x04\x62ody\x18\x03 \x01(\t\x12\x16\n\tupdate_at\x18\x04 \x01(\x02H\x00\x88\x01\x01\x12\x12\n\ncreated_at\x18\x05 \x01(\x02\x42\x0c\n\n_update_at\"\x15\n\x13GetListNotesRequest\"=\n\x14GetListNotesResponse\x12%\n\x05notes\x18\x01 \x03(\x0b\x32\x16.notes.GetNoteResponse2\x97\x02\n\x04Note\x12\x41\n\nCreateNote\x12\x18.notes.CreateNoteRequest\x1a\x19.notes.CreateNoteResponse\x12\x38\n\x07GetNote\x12\x15.notes.GetNoteRequest\x1a\x16.notes.GetNoteResponse\x12\x43\n\x08GetNotes\x12\x1a.notes.GetListNotesRequest\x1a\x1b.notes.GetListNotesResponse\x12M\n\x0e\x43reateCategory\x12\x1c.notes.CreateCategoryRequest\x1a\x1d.notes.CreateCategoryResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'notes_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_CREATENOTEREQUEST']._serialized_start=22
-  _globals['_CREATENOTEREQUEST']._serialized_end=88
-  _globals['_CREATENOTERESPONSE']._serialized_start=90
-  _globals['_CREATENOTERESPONSE']._serialized_end=128
-  _globals['_GETNOTEREQUEST']._serialized_start=130
-  _globals['_GETNOTEREQUEST']._serialized_end=164
-  _globals['_GETNOTERESPONSE']._serialized_start=166
-  _globals['_GETNOTERESPONSE']._serialized_end=288
-  _globals['_GETLISTNOTESREQUEST']._serialized_start=290
-  _globals['_GETLISTNOTESREQUEST']._serialized_end=311
-  _globals['_GETLISTNOTESRESPONSE']._serialized_start=313
-  _globals['_GETLISTNOTESRESPONSE']._serialized_end=374
-  _globals['_NOTE']._serialized_start=377
-  _globals['_NOTE']._serialized_end=577
+  _globals['_CREATECATEGORYREQUEST']._serialized_start=22
+  _globals['_CREATECATEGORYREQUEST']._serialized_end=68
+  _globals['_CREATECATEGORYRESPONSE']._serialized_start=70
+  _globals['_CREATECATEGORYRESPONSE']._serialized_end=115
+  _globals['_CREATENOTEREQUEST']._serialized_start=117
+  _globals['_CREATENOTEREQUEST']._serialized_end=226
+  _globals['_CREATENOTERESPONSE']._serialized_start=228
+  _globals['_CREATENOTERESPONSE']._serialized_end=267
+  _globals['_GETNOTEREQUEST']._serialized_start=269
+  _globals['_GETNOTEREQUEST']._serialized_end=304
+  _globals['_GETNOTERESPONSE']._serialized_start=306
+  _globals['_GETNOTERESPONSE']._serialized_end=429
+  _globals['_GETLISTNOTESREQUEST']._serialized_start=431
+  _globals['_GETLISTNOTESREQUEST']._serialized_end=452
+  _globals['_GETLISTNOTESRESPONSE']._serialized_start=454
+  _globals['_GETLISTNOTESRESPONSE']._serialized_end=515
+  _globals['_NOTE']._serialized_start=518
+  _globals['_NOTE']._serialized_end=797
 # @@protoc_insertion_point(module_scope)
