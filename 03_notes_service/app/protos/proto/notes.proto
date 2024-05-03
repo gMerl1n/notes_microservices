@@ -5,29 +5,37 @@ package notes;
 
 service Note {
     rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse);
-    rpc GetNote (GetNoteRequest) returns (GetNoteReponse);
-    rpc GetNotes (GetNotesRequest) returns (GetNotesReponse);
-    rpc DeleteNote (DeleteNoteRequest) returns (DeleteNoteReponse);
+    rpc GetNote (GetNoteRequest) returns (GetNoteResponse);
+    rpc GetNotes (GetListNotesRequest) returns (GetListNotesResponse);
+    // rpc DeleteNote (DeleteNoteRequest) returns (DeleteNoteReponse);
 }
 
 message CreateNoteRequest {
-    string userUUID = 1; // Email of the user to register
-    string title = 2; // Password of the user to register
-    string body = 2; // Password of the user to register
+    string userUUID = 1; // note id
+    string title = 2; // note title
+    string body = 3; // note body
 }
 
 message CreateNoteResponse {
-    string noteUUID = 1; // Email of the user to register
+    string noteUUID = 1; // note id
 }
 
 message GetNoteRequest {
-    string noteUUID = 1; // Email of the user to register
+    string noteUUID = 1; // note id
 }
 
-message GetNoteReponse {
-    string noteUUID = 1; // Email of the user to register
-    string title = 2; // Password of the user to register
-    string body = 3; // Password of the user to register
-    optional float update_at = 4;      
-    float created_at = 5;   
+message GetNoteResponse {
+    string noteUUID = 1; // note id
+    string title = 2; // note title
+    string body = 3; // note body
+    optional float update_at = 4; // if the note was updated     
+    float created_at = 5; // time when the note was created
+}
+
+message GetListNotesRequest {
+
+}
+
+message GetListNotesResponse {
+    repeated GetNoteResponse notes = 1;
 }
