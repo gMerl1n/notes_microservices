@@ -109,7 +109,8 @@ func (s *service) createSession(ctx context.Context, userUUID string) (jwt.Token
 	}
 	session := Session{
 		UserUUID:  userUUID,
-		ExpiresAt: time.Now().Add(s.refreshTokenTTL),
+		ExpiresAt: time.Duration(s.refreshTokenTTL) * time.Minute,
+		// ExpiresAt: time.Now().Add(s.refreshTokenTTL),
 	}
 
 	err = s.redis.SetSession(ctx, res.RefreshToken, session)

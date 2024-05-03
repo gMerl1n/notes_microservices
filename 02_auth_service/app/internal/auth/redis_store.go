@@ -9,7 +9,7 @@ import (
 
 type Session struct {
 	UserUUID  string
-	ExpiresAt time.Time
+	ExpiresAt time.Duration
 }
 
 type RedisStorage interface {
@@ -30,6 +30,12 @@ func (r *RedisRepo) SetSession(ctx context.Context, RefreshToken string, sess Se
 	if err := r.client.HSet(ctx, RefreshToken, "UserUUID", sess.UserUUID, "ExpiresAt", sess.ExpiresAt).Err(); err != nil {
 		return err
 	}
+
+	var q time.Time
+	q = time.Now().Local().Add(10 * time.Second)
+
+	r.client.ExpireAt(ctx, RefreshToken, q)
+
 	return nil
 }
 

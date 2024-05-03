@@ -70,9 +70,6 @@ func main() {
 
 	// initializing tokenManager to generate JWT
 
-	// accessTokenTTL  int    `yaml:"access_tokenTTL"`
-	// refreshTokenTTL int    `yaml:"refresh_tokenTTL"`
-
 	tokenManager, err := jwt.NewManager(conf.JWTSecret, time.Duration(conf.AccessTokenTTL)*time.Minute, time.Duration(conf.RefreshTokenTTL)*time.Minute)
 	if err != nil {
 		logger.Fatal(err)
