@@ -36,3 +36,8 @@ class ListNotesByCategory(BaseModel):
 
     category: Category
     list_notes: ListNotes
+
+
+class NotesByCategory(BaseModel):
+
+    category_id: int
