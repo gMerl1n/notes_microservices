@@ -1,10 +1,12 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 load_dotenv()
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST")
 POSTGRES_PORT = os.environ.get("POSTGRES_PORT")
@@ -19,3 +21,5 @@ async_session = sessionmaker(autoflush=False, bind=engine, class_=AsyncSession)
 
 
 NOTES_GRPC_SERVER_ADDR = "0.0.0.0:50052"
+
+print(BASE_DIR)

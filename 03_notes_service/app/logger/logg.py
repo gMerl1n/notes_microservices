@@ -1,5 +1,7 @@
+import os
 import logging
-from typing import Literal
+from app.settings import settings
+
 
 
 def init_logger(name: str, level: int = logging.INFO):
@@ -10,11 +12,16 @@ def init_logger(name: str, level: int = logging.INFO):
     logger = logging.getLogger(name)
     logger.setLevel(level)
     console_log = logging.StreamHandler()
-    file_log = logging.FileHandler(filename='logs\\logs.log', mode='a')
+
+    logs_path = os.path.join(settings.BASE_DIR, "logger", "logs.log")
+
+    file_log = logging.FileHandler(filename=logs_path, mode='a')
     console_log.setFormatter(logging.Formatter(
         '%(asctime)s, — %(levelname)s — module: %(name)s — %(message)s'))
     file_log.setFormatter(logging.Formatter(
         '%(asctime)s, — %(levelname)s — module: %(name)s — %(message)s'))
+    
+
     logger.addHandler(console_log)
     logger.addHandler(file_log)
 

@@ -18,16 +18,16 @@ class CreateCategoryResponse(_message.Message):
     def __init__(self, category_id: _Optional[int] = ...) -> None: ...
 
 class CreateNoteRequest(_message.Message):
-    __slots__ = ("user_uuid", "category_id", "title", "body")
+    __slots__ = ("user_uuid", "category_name", "title", "body")
     USER_UUID_FIELD_NUMBER: _ClassVar[int]
-    CATEGORY_ID_FIELD_NUMBER: _ClassVar[int]
+    CATEGORY_NAME_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     BODY_FIELD_NUMBER: _ClassVar[int]
     user_uuid: str
-    category_id: int
+    category_name: str
     title: str
     body: str
-    def __init__(self, user_uuid: _Optional[str] = ..., category_id: _Optional[int] = ..., title: _Optional[str] = ..., body: _Optional[str] = ...) -> None: ...
+    def __init__(self, user_uuid: _Optional[str] = ..., category_name: _Optional[str] = ..., title: _Optional[str] = ..., body: _Optional[str] = ...) -> None: ...
 
 class CreateNoteResponse(_message.Message):
     __slots__ = ("note_uuid",)

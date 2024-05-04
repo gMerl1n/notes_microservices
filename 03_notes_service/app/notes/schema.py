@@ -16,7 +16,7 @@ class Categories(BaseModel):
 class Note(BaseModel):
 
     user_uuid: uuid.UUID
-    category_id: Optional[int] = None
+    category_name: Optional[str] = None
     title: str
     body: str
     update_at: Optional[float] = None

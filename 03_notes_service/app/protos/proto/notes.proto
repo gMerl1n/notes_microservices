@@ -21,7 +21,7 @@ message CreateCategoryResponse {
 
 message CreateNoteRequest {
     string user_uuid = 1; // note id
-    optional int64 category_id = 2;
+    optional string category_name = 2;
     string title = 3; // note title
     string body = 4; // note body
 }
