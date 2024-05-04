@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: c3b296f5c083
+Revision ID: 8a63dcc2e68e
 Revises: 
-Create Date: 2024-05-02 15:19:20.295370
+Create Date: 2024-05-04 15:58:37.728242
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'c3b296f5c083'
+revision = '8a63dcc2e68e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,6 +21,7 @@ def upgrade():
     op.create_table('categories',
     sa.Column('category_id', sa.Integer(), nullable=False),
     sa.Column('category_name', sa.String(), nullable=False),
+    sa.Column('user_uuid', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('update_at', sa.TIMESTAMP(), nullable=True),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
     sa.PrimaryKeyConstraint('category_id')
@@ -29,6 +30,7 @@ def upgrade():
     op.create_table('notes',
     sa.Column('note_uuid', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('category_id', sa.Integer(), nullable=True),
+    sa.Column('user_uuid', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('title', sa.String(), nullable=False),
     sa.Column('body', sa.Text(), nullable=True),
     sa.Column('update_at', sa.TIMESTAMP(), nullable=True),
