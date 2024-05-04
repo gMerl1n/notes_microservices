@@ -94,8 +94,9 @@ message GetNotesByCategoryResponse {
 
 message UpdateNoteRequest {
     string note_uuid = 1; // note id
-    optional string title = 2; // note title
-    optional string body = 3; // note body
+    optional string category_name = 2;
+    optional string title = 3; // note title
+    optional string body = 4; // note body
 }
 
 message UpdateNoteResponse {

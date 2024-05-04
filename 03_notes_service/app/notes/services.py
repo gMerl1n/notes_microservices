@@ -99,7 +99,7 @@ async def get_note_by_id(uuid, async_session: AsyncSession):
     """
 
     async with async_session() as session:
-        
+
         query = select(Note).where(Note.note_uuid == uuid)
         res = await session.execute(query)
         note = res.scalar()
@@ -137,3 +137,27 @@ async def get_notes_by_category(category_id: schema.NotesByCategory, async_sessi
             })
 
         return notes, count_notes
+    
+
+async def update_note(note_uuid: str, params_to_update: schema.NoteUpdate, async_session: AsyncSession):
+
+    
+    data_to_update = params_to_update.dict(exclude_none=True)
+    
+    
+    async with async_session() as session:
+
+        if data_to_update["category_name"] is not None:
+            query = select(Category.category_id).where(Category.category_name == params_to_update.category_name)
+            category_id = await session.execute(query)
+            data_to_update.pop("category_name")
+            data_to_update["category_id"] = category_id.scalar()
+
+        
+        query_to_update = update(Note).where(Note.note_uuid == note_uuid).values(**data_to_update).returning(Note.note_uuid)
+        note_uuid = await session.execute(query_to_update)
+        await session.commit()
+
+    note_uuid_updated = note_uuid.scalar()
+
+    return str(note_uuid_updated) #str() is necessary to serialize by protobuf

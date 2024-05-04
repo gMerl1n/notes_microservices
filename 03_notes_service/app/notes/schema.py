@@ -41,3 +41,19 @@ class ListNotesByCategory(BaseModel):
 class NotesByCategory(BaseModel):
 
     category_id: int
+
+
+class NoteUpdate(BaseModel):
+
+    category_name: Optional[str] = None
+    title: Optional[str] = None
+    body: Optional[str] = None
+
+
+
+#     message UpdateNoteRequest {
+#     string note_uuid = 1; // note id
+#     optional string category_name = 2;
+#     optional string title = 3; // note title
+#     optional string body = 4; // note body
+# }

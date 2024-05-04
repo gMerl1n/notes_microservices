@@ -1,7 +1,7 @@
 from app.protos.genproto import notes_pb2_grpc, notes_pb2
 from google.protobuf.json_format import MessageToDict
-from .schema import Note, Category, NotesByCategory
-from .services import create_note, create_category, get_list_notes, get_note_by_id, get_notes_by_category
+from .schema import Note, Category, NotesByCategory, NoteUpdate
+from .services import create_note, create_category, get_list_notes, get_note_by_id, get_notes_by_category, update_note
 from app.settings import settings
 from app.logger.logg import init_logger
 from datetime import datetime
@@ -97,7 +97,20 @@ class NoteService(notes_pb2_grpc.NoteServicer):
 
     #rpc UpdateNote (UpdateNoteRequest) returns (UpdateNoteResponse);
     async def UpdateNote(self, request, context):
-        pass
+        
+        logger.info("UpdateNote: request from api has received")
+
+        data_to_update = MessageToDict(request, preserving_proto_field_name=True)
+        serialized_category = NoteUpdate.model_validate(data_to_update)
+
+        try:
+            note_uuid = await update_note(note_uuid=data_to_update["note_uuid"],
+                                    params_to_update=serialized_category,
+                                    async_session=settings.async_session)
+        except Exception as ex:
+            logger.warning(f"UpdateNote: notes has not been updated. Error: {str(ex)}")
+
+        return notes_pb2.UpdateNoteResponse(note_uuid=note_uuid) 
 
 
     #rpc DeleteNote (DeleteNoteRequest) returns (DeleteNoteReponse);

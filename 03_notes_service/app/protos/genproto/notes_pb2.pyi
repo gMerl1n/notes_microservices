@@ -112,14 +112,16 @@ class GetNotesByCategoryResponse(_message.Message):
     def __init__(self, count_notes_by_cat: _Optional[int] = ..., notes: _Optional[_Iterable[_Union[GetNotesByCategoryObject, _Mapping]]] = ...) -> None: ...
 
 class UpdateNoteRequest(_message.Message):
-    __slots__ = ("note_uuid", "title", "body")
+    __slots__ = ("note_uuid", "category_name", "title", "body")
     NOTE_UUID_FIELD_NUMBER: _ClassVar[int]
+    CATEGORY_NAME_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     BODY_FIELD_NUMBER: _ClassVar[int]
     note_uuid: str
+    category_name: str
     title: str
     body: str
-    def __init__(self, note_uuid: _Optional[str] = ..., title: _Optional[str] = ..., body: _Optional[str] = ...) -> None: ...
+    def __init__(self, note_uuid: _Optional[str] = ..., category_name: _Optional[str] = ..., title: _Optional[str] = ..., body: _Optional[str] = ...) -> None: ...
 
 class UpdateNoteResponse(_message.Message):
     __slots__ = ("note_uuid",)
