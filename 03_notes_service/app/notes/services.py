@@ -5,6 +5,40 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update, and_, func, select
 
 
+async def verify_permission_note(note_uuid: str, user_uuid: str, async_session: AsyncSession):
+
+    """
+    check user`s permission to get note
+    """
+
+    async with async_session() as session:
+
+        query = select(Note.user_uuid).where(Note.note_uuid == note_uuid)
+        query_result = await session.execute(query)
+        user_uuid_from_db = query_result.scalar()
+
+    if user_uuid == str(user_uuid_from_db):
+        return True
+
+
+async def verify_permission_category(category_id: int, user_uuid: str, async_session: AsyncSession):
+
+    """
+    check user`s permission to get category and notes related to this category
+    """
+    
+    async with async_session() as session:
+
+        query = select(Category.user_uuid).where(Category.category_id == category_id)
+        query_result = await session.execute(query)
+        user_uuid_from_db = query_result.scalar()
+
+    print(user_uuid)
+    print(user_uuid_from_db)
+    if user_uuid == str(user_uuid_from_db):
+        return True
+
+
 async def create_note(note: schema.Note, async_session: AsyncSession):
 
     """
@@ -29,7 +63,7 @@ async def create_note(note: schema.Note, async_session: AsyncSession):
     return new_note.note_uuid
 
 
-async def create_category(category: schema.Category, async_session: AsyncSession):
+async def create_category(category: schema.CategoryCreate, async_session: AsyncSession):
 
     """
     insert a new category into db
@@ -37,7 +71,7 @@ async def create_category(category: schema.Category, async_session: AsyncSession
 
     async with async_session() as session:
         
-        new_category = Category(category_name=category.category_name, created_at=datetime.now())
+        new_category = Category(user_uuid=category.user_uuid, category_name=category.category_name, created_at=datetime.now())
 
         session.add(new_category)
         await session.commit()
@@ -63,7 +97,7 @@ async def get_category_by_name(category_name: str, async_session: AsyncSession):
              return category.category_id
 
 
-async def get_list_notes(async_session: AsyncSession):
+async def get_list_notes(user_uuid: str, async_session: AsyncSession):
 
     """
     extract all notes from db
@@ -74,7 +108,7 @@ async def get_list_notes(async_session: AsyncSession):
 
     async with async_session() as session:
         #left outer join
-        query = select(Note, Category.category_name).join(Category, Note.category_id == Category.category_id, isouter=True)
+        query = select(Note, Category.category_name).join(Category, Note.category_id == Category.category_id, isouter=True).where(Note.user_uuid == user_uuid)
         query_result = await session.execute(query)
 
         if query_result is not None:
@@ -143,17 +177,19 @@ async def update_note(note_uuid: str, params_to_update: schema.NoteUpdate, async
 
     
     data_to_update = params_to_update.dict(exclude_none=True)
+
+    print(data_to_update)
     
     
     async with async_session() as session:
 
         if data_to_update["category_name"] is not None:
-            query = select(Category.category_id).where(Category.category_name == params_to_update.category_name)
+            query = select(Category.category_id).where(Category.category_name == data_to_update["category_name"])
             category_id = await session.execute(query)
-            data_to_update.pop("category_name")
             data_to_update["category_id"] = category_id.scalar()
 
-        
+        data_to_update.pop("category_name")
+
         query_to_update = update(Note).where(Note.note_uuid == note_uuid).values(**data_to_update).returning(Note.note_uuid)
         note_uuid = await session.execute(query_to_update)
         await session.commit()

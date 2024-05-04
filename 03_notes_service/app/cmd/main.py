@@ -7,7 +7,7 @@ if __name__ == '__main__':
     asyncio.run(notes_server.run_server(settings.NOTES_GRPC_SERVER_ADDR))
 
 
-# import sys
+import sys
 
-# for i in sys.path:
-#     print(i)
+for i in sys.path:
+    print(i)

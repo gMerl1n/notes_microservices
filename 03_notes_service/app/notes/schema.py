@@ -2,6 +2,61 @@ import uuid
 from typing import List, Optional
 from pydantic import BaseModel
 
+# Notes pydantic models
+
+class Note(BaseModel):
+
+    user_uuid: str
+    category_name: Optional[str] = None
+    title: str
+    body: str
+    update_at: Optional[float] = None
+    created_at: Optional[float] = None
+
+
+class NoteCreate(Note):
+    pass
+
+
+class NoteGet(BaseModel):
+
+    user_uuid: str
+    note_uuid: str
+
+
+class ListNotesGet(BaseModel):
+
+    user_uuid: str
+
+
+class ListNotesByCategory(BaseModel):
+
+    category: str
+    list_notes: List[Note]
+
+
+class NotesByCategory(BaseModel):
+
+    user_uuid: str
+    category_id: int
+
+
+class NoteUpdate(BaseModel):
+
+    user_uuid: str
+    note_uuid: str
+    category_name: Optional[str] = None
+    title: Optional[str] = None
+    body: Optional[str] = None
+
+
+class NoteDelete(BaseModel):
+
+    note_uuid: str
+
+
+# Category pydantic models
+    
 
 class Category(BaseModel):
 
@@ -13,47 +68,12 @@ class Categories(BaseModel):
     list_categories: List[Category]
 
 
-class Note(BaseModel):
+class CategoryCreate(BaseModel):
 
-    user_uuid: uuid.UUID
-    category_name: Optional[str] = None
-    title: str
-    body: str
-    update_at: Optional[float] = None
-    created_at: Optional[float] = None
+    user_uuid: str
+    category_name: str
 
 
-# class NoteResponse(BaseModel):
+class CategoryGet(BaseModel):
 
-#     note_uuid: str
-
-class ListNotes(BaseModel):
-
-    notes: List[Note]
-
-
-class ListNotesByCategory(BaseModel):
-
-    category: Category
-    list_notes: ListNotes
-
-
-class NotesByCategory(BaseModel):
-
-    category_id: int
-
-
-class NoteUpdate(BaseModel):
-
-    category_name: Optional[str] = None
-    title: Optional[str] = None
-    body: Optional[str] = None
-
-
-
-#     message UpdateNoteRequest {
-#     string note_uuid = 1; // note id
-#     optional string category_name = 2;
-#     optional string title = 3; // note title
-#     optional string body = 4; // note body
-# }
+    user_uuid: str
