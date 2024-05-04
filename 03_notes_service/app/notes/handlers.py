@@ -53,8 +53,6 @@ class NoteService(notes_pb2_grpc.NoteServicer):
             logger.warning(f"GetNotes: notes has not been added. Error: {str(ex)}")
         return notes_pb2.GetListNotesResponse(notes=notes)
 
-        
-
 
     async def GetNote(self, request, context):
         
@@ -63,17 +61,9 @@ class NoteService(notes_pb2_grpc.NoteServicer):
             note = await get_note_by_id(uuid=note["note_uuid"], async_session=settings.async_session)
         except Exception as ex:
             logger.warning(f"GetNote: note has not been added. Error: {str(ex)}")
-        print(str(note.note_uuid))
         return notes_pb2.GetNoteResponse(note_uuid=str(note.note_uuid), 
                                          title=note.title,
                                          body=note.body,
                                          update_at=datetime.timestamp(note.update_at) if note.update_at is not None else None,
                                          created_at=datetime.timestamp(note.created_at)
         )
-    
-
-    # note_uuid: str | None = ...,
-    # title: str | None = ...,
-    # body: str | None = ...,
-    # update_at: float | None = ...,
-    # created_at: float | None = ...

@@ -8,16 +8,12 @@ service Note {
     rpc GetNote (GetNoteRequest) returns (GetNoteResponse);
     rpc GetNotes (GetListNotesRequest) returns (GetListNotesResponse);
     rpc CreateCategory (CreateCategoryRequest) returns (CreateCategoryResponse);
-    // rpc DeleteNote (DeleteNoteRequest) returns (DeleteNoteReponse);
+    rpc GetNotesByCategory (GetNotesByCategoryRequest) returns (GetNotesByCategoryResponse);
+    rpc UpdateNote (UpdateNoteRequest) returns (UpdateNoteResponse);
+    rpc DeleteNote (DeleteNoteRequest) returns (DeleteNoteReponse);
 }
 
-message CreateCategoryRequest {
-    string category_name = 1;
-}
-
-message CreateCategoryResponse {
-    int64 category_id = 1;
-}
+// rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse);
 
 message CreateNoteRequest {
     string user_uuid = 1; // note id
@@ -29,6 +25,8 @@ message CreateNoteRequest {
 message CreateNoteResponse {
     string note_uuid = 1; // note id
 }
+
+// rpc GetNote (GetNoteRequest) returns (GetNoteResponse);
 
 message GetNoteRequest {
     string note_uuid = 1; // note id
@@ -42,10 +40,56 @@ message GetNoteResponse {
     float created_at = 5; // time when the note was created
 }
 
+// rpc GetNotes (GetListNotesRequest) returns (GetListNotesResponse);
+
 message GetListNotesRequest {
 
 }
 
 message GetListNotesResponse {
     repeated GetNoteResponse notes = 1;
+}
+
+// rpc CreateCategory (CreateCategoryRequest) returns (CreateCategoryResponse);
+
+message CreateCategoryRequest {
+    string category_name = 1;
+}
+
+message CreateCategoryResponse {
+    int64 category_id = 1;
+}
+
+
+// rpc GetNotesByCategory (GetNotesByCategoryRequest) returns (GetNotesByCategoryResponse);
+
+message GetNotesByCategoryRequest {
+    int64 category_id = 1;
+}
+
+message GetNotesByCategoryResponse {
+    string category_name = 1;
+    repeated GetNoteResponse notes = 2;
+}
+
+// rpc UpdateNote (UpdateNoteRequest) returns (UpdateNoteResponse);
+
+message UpdateNoteRequest {
+    string note_uuid = 1; // note id
+    optional string title = 2; // note title
+    optional string body = 3; // note body
+}
+
+message UpdateNoteResponse {
+    string note_uuid = 1; // note id
+}
+
+// rpc DeleteNote (DeleteNoteRequest) returns (DeleteNoteReponse);
+
+message DeleteNoteRequest {
+    string note_uuid = 1; // note id
+}
+
+message DeleteNoteReponse {
+    string note_uuid = 1; // note id
 }

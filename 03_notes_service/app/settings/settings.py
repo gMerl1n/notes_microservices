@@ -21,5 +21,3 @@ async_session = sessionmaker(autoflush=False, bind=engine, class_=AsyncSession)
 
 
 NOTES_GRPC_SERVER_ADDR = "0.0.0.0:50052"
-
-print(BASE_DIR)

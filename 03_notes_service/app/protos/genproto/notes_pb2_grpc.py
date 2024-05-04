@@ -34,6 +34,21 @@ class NoteStub(object):
                 request_serializer=notes__pb2.CreateCategoryRequest.SerializeToString,
                 response_deserializer=notes__pb2.CreateCategoryResponse.FromString,
                 )
+        self.GetNotesByCategory = channel.unary_unary(
+                '/notes.Note/GetNotesByCategory',
+                request_serializer=notes__pb2.GetNotesByCategoryRequest.SerializeToString,
+                response_deserializer=notes__pb2.GetNotesByCategoryResponse.FromString,
+                )
+        self.UpdateNote = channel.unary_unary(
+                '/notes.Note/UpdateNote',
+                request_serializer=notes__pb2.UpdateNoteRequest.SerializeToString,
+                response_deserializer=notes__pb2.UpdateNoteResponse.FromString,
+                )
+        self.DeleteNote = channel.unary_unary(
+                '/notes.Note/DeleteNote',
+                request_serializer=notes__pb2.DeleteNoteRequest.SerializeToString,
+                response_deserializer=notes__pb2.DeleteNoteReponse.FromString,
+                )
 
 
 class NoteServicer(object):
@@ -58,8 +73,25 @@ class NoteServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def CreateCategory(self, request, context):
-        """rpc DeleteNote (DeleteNoteRequest) returns (DeleteNoteReponse);
-        """
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetNotesByCategory(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateNote(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteNote(self, request, context):
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -86,6 +118,21 @@ def add_NoteServicer_to_server(servicer, server):
                     servicer.CreateCategory,
                     request_deserializer=notes__pb2.CreateCategoryRequest.FromString,
                     response_serializer=notes__pb2.CreateCategoryResponse.SerializeToString,
+            ),
+            'GetNotesByCategory': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetNotesByCategory,
+                    request_deserializer=notes__pb2.GetNotesByCategoryRequest.FromString,
+                    response_serializer=notes__pb2.GetNotesByCategoryResponse.SerializeToString,
+            ),
+            'UpdateNote': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateNote,
+                    request_deserializer=notes__pb2.UpdateNoteRequest.FromString,
+                    response_serializer=notes__pb2.UpdateNoteResponse.SerializeToString,
+            ),
+            'DeleteNote': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteNote,
+                    request_deserializer=notes__pb2.DeleteNoteRequest.FromString,
+                    response_serializer=notes__pb2.DeleteNoteReponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -162,5 +209,56 @@ class Note(object):
         return grpc.experimental.unary_unary(request, target, '/notes.Note/CreateCategory',
             notes__pb2.CreateCategoryRequest.SerializeToString,
             notes__pb2.CreateCategoryResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetNotesByCategory(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/notes.Note/GetNotesByCategory',
+            notes__pb2.GetNotesByCategoryRequest.SerializeToString,
+            notes__pb2.GetNotesByCategoryResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def UpdateNote(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/notes.Note/UpdateNote',
+            notes__pb2.UpdateNoteRequest.SerializeToString,
+            notes__pb2.UpdateNoteResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeleteNote(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/notes.Note/DeleteNote',
+            notes__pb2.DeleteNoteRequest.SerializeToString,
+            notes__pb2.DeleteNoteReponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
