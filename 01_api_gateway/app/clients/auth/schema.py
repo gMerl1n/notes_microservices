@@ -1,11 +1,13 @@
 from pydantic import BaseModel
 
 
+class AuthUser(BaseModel):
+
+    email: str
+    password: str
+
+
 class Token(BaseModel):
-    
-    access_token: str
 
-
-class User(BaseModel):
-    
-    userUUID: str
+    AccessToken: str
+    RefreshToken: str

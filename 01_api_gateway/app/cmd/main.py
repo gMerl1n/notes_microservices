@@ -9,3 +9,6 @@ app = FastAPI()
 
 
 app.include_router(routes.routes)
+
+
+
