@@ -1,16 +1,26 @@
 version: "3.9"
 
 services:
-  db:
+
+  notes_service:
+    build: .
+    container_name: notes_service
+    command: "python3 -m app.cmd.main"
+    ports:
+      - "50052:50052"
+    depends_on:
+      - qwert
+
+  qwert:
     image: postgres
-    container_name: notes_db
+    container_name: qwert
     volumes:
       - data_notes:/var/lib/postgresql/data/
     restart: always
     env_file:
       - .env
     ports:
-    - "5433:5432"
+    - "5444:5432"
   
 volumes:
   data_notes:

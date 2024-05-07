@@ -2,7 +2,10 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import notes_pb2 as notes__pb2
+# import notes_pb2 as notes__pb2
+#from app.protos.genproto 
+import app.protos.genproto.notes_pb2 as notes__pb2
+#import notes_pb2
 
 
 class NoteStub(object):
