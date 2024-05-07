@@ -2,8 +2,8 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import notes_pb2 as notes__pb2
-
+# import notes_pb2 as notes__pb2
+from . import notes_pb2
 
 class NoteStub(object):
     """Missing associated documentation comment in .proto file."""
