@@ -95,12 +95,16 @@ message GetNotesByCategoryResponse {
 
 // rpc UpdateNote (UpdateNoteRequest) returns (UpdateNoteResponse);
 
-message UpdateNoteRequest {
+message UpdateNoteObject {
     string note_uuid = 1; // note id
-    string user_uuid = 2; // user uuid
     optional string category_name = 3;
     optional string title = 4; // note title
     optional string body = 5; // note body
+}
+
+message UpdateNoteRequest {
+    string user_uuid = 1; // user uuid
+    UpdateNoteObject note_to_update = 2;
 }
 
 message UpdateNoteResponse {

@@ -119,19 +119,25 @@ class GetNotesByCategoryResponse(_message.Message):
     notes: _containers.RepeatedCompositeFieldContainer[GetNotesByCategoryObject]
     def __init__(self, count_notes_by_cat: _Optional[int] = ..., notes: _Optional[_Iterable[_Union[GetNotesByCategoryObject, _Mapping]]] = ...) -> None: ...
 
-class UpdateNoteRequest(_message.Message):
-    __slots__ = ("note_uuid", "user_uuid", "category_name", "title", "body")
+class UpdateNoteObject(_message.Message):
+    __slots__ = ("note_uuid", "category_name", "title", "body")
     NOTE_UUID_FIELD_NUMBER: _ClassVar[int]
-    USER_UUID_FIELD_NUMBER: _ClassVar[int]
     CATEGORY_NAME_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     BODY_FIELD_NUMBER: _ClassVar[int]
     note_uuid: str
-    user_uuid: str
     category_name: str
     title: str
     body: str
-    def __init__(self, note_uuid: _Optional[str] = ..., user_uuid: _Optional[str] = ..., category_name: _Optional[str] = ..., title: _Optional[str] = ..., body: _Optional[str] = ...) -> None: ...
+    def __init__(self, note_uuid: _Optional[str] = ..., category_name: _Optional[str] = ..., title: _Optional[str] = ..., body: _Optional[str] = ...) -> None: ...
+
+class UpdateNoteRequest(_message.Message):
+    __slots__ = ("user_uuid", "note_to_update")
+    USER_UUID_FIELD_NUMBER: _ClassVar[int]
+    NOTE_TO_UPDATE_FIELD_NUMBER: _ClassVar[int]
+    user_uuid: str
+    note_to_update: UpdateNoteObject
+    def __init__(self, user_uuid: _Optional[str] = ..., note_to_update: _Optional[_Union[UpdateNoteObject, _Mapping]] = ...) -> None: ...
 
 class UpdateNoteResponse(_message.Message):
     __slots__ = ("note_uuid",)
