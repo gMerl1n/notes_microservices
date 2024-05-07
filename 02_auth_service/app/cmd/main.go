@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log/slog"
 	"net/http"
 	"os"
 	"strconv"
@@ -89,7 +88,7 @@ func main() {
 
 	//srv, err := server.NewHttpServer(conf.Port)
 
-	logger.Info("starting application", slog.String("env", conf.Env), slog.Any("cfg", conf))
+	//logger.Info("starting application", slog.String("env", conf.Env), slog.Any("cfg", conf))
 
 	srv, err := NewHttpServer(router, conf)
 

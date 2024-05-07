@@ -38,8 +38,6 @@ func (h *Handler) AuthMiddleware(hf http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		//fmt.Println(AuthMiddleware, userId)
-
 		ctx := context.WithValue(request.Context(), UserContextKey, userUUID)
 		request = request.WithContext(ctx)
 

@@ -7,7 +7,6 @@ import (
 
 	"github.com/iriskin77/notes_microservices/app/pkg/jwt"
 	"github.com/iriskin77/notes_microservices/app/pkg/logging"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
@@ -77,10 +76,17 @@ func (s *service) Login(ctx context.Context, loginUser LoginUserDTO) (*jwt.Token
 		return nil, err
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(lgUser.Password)); err != nil {
-		s.logger.Error("Failed to compare password and repeated password", err)
-		return nil, err
-	}
+	// ph, _ := generatePasswordHash(lgUser.Password)
+
+	// fmt.Println("Login", user)
+	// fmt.Println("Login", user.Password)
+
+	// if err := bcrypt.CompareHashAndPassword([]byte(ph), []byte(lgUser.Password)); err != nil {
+	// 	s.logger.Error("Failed to compare password and repeated password", err)
+	// 	return nil, err
+	// }
+
+	fmt.Println("UUID", user.Email)
 
 	tokens, err := s.createSession(ctx, user.UUID)
 	if err != nil {

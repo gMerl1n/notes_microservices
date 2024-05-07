@@ -26,8 +26,8 @@ func NewHandler(services Service, tokenManager jwt.TokenManager, logger *logging
 
 func (h *Handler) RegisterHandlers(router *mux.Router) {
 	router.HandleFunc("/api/auth/register", h.CreateUser).Methods("Post")
-	router.HandleFunc("/api/auth/login", h.Login).Methods("Get")
-	router.HandleFunc("/api/auth/refreshtokens", h.AuthMiddleware(h.RefreshTokens)).Methods("Get")
+	router.HandleFunc("/api/auth/login", h.Login).Methods("Post")
+	router.HandleFunc("/api/auth/refreshtokens", h.RefreshTokens).Methods("Get")
 }
 
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
