@@ -9,11 +9,11 @@ services:
     ports:
       - "50052:50052"
     depends_on:
-      - qwert
+      - db_notes
 
-  qwert:
+  db_notes:
     image: postgres
-    container_name: qwert
+    container_name: db_notes
     volumes:
       - data_notes:/var/lib/postgresql/data/
     restart: always
