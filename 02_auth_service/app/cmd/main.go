@@ -20,7 +20,7 @@ import (
 func main() {
 
 	// initializing config
-	conf := config.LoadConfig()
+	conf := config.LoadConfig("./app/config/config.yml")
 
 	// initializing logger
 	logging.Init()
