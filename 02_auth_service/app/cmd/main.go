@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -52,13 +51,14 @@ func main() {
 
 	// initializing Redis
 
-	i, _ := strconv.Atoi(os.Getenv("REDIS_DB"))
-
-	redisConfig := redis_client.NewRedisConfig(
+	redisConfig, err := redis_client.NewRedisConfig(
 		os.Getenv("REDIS_PORT"),
 		os.Getenv("REDIS_PASSWORD"),
-		i,
+		os.Getenv("REDIS_DB"),
 	)
+	if err != nil {
+		logger.Fatal(err)
+	}
 
 	clientRedis, err := redis_client.NewRedisClient(redisConfig)
 	if err != nil {
@@ -85,10 +85,6 @@ func main() {
 	router := mux.NewRouter()
 
 	h.RegisterHandlers(router)
-
-	//srv, err := server.NewHttpServer(conf.Port)
-
-	//logger.Info("starting application", slog.String("env", conf.Env), slog.Any("cfg", conf))
 
 	srv, err := NewHttpServer(router, conf)
 

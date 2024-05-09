@@ -2,6 +2,7 @@ package redis_client
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -12,12 +13,19 @@ type ConfigRedis struct {
 	dbRedis       int
 }
 
-func NewRedisConfig(addrRedis string, passwordRedis string, dbRedis int) *ConfigRedis {
+func NewRedisConfig(addrRedis string, passwordRedis string, dbRedis string) (*ConfigRedis, error) {
+
+	dbr, err := strconv.Atoi(dbRedis)
+
+	if err != nil {
+		return nil, err
+	}
+
 	return &ConfigRedis{
 		addrRedis:     addrRedis,
 		passwordRedis: passwordRedis,
-		dbRedis:       dbRedis,
-	}
+		dbRedis:       dbr,
+	}, nil
 }
 
 func NewRedisClient(cfg *ConfigRedis) (*redis.Client, error) {

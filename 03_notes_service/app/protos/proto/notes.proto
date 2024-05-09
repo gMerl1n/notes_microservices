@@ -4,7 +4,7 @@ package notes;
 
 
 service Note {
-    rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse);
+    rpc CreateNote (stream CreateNoteRequest) returns (CreateNoteResponse);
     rpc GetNote (GetNoteRequest) returns (GetNoteResponse);
     rpc GetNotes (GetListNotesRequest) returns (GetListNotesResponse);
     rpc CreateCategory (CreateCategoryRequest) returns (CreateCategoryResponse);
@@ -20,6 +20,7 @@ message CreateNoteRequest {
     optional string category_name = 2;
     string title = 3; // note title
     string body = 4; // note body
+    optional bytes binary = 5; // optional file (image for example)
 }
 
 message CreateNoteResponse {
