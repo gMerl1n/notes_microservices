@@ -33,7 +33,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     auth_input = {"email": form_data.username, "password": form_data.password}
 
     try:
-        #print(auth_input.dict())
         auth_token = requests.post(url=settings.LOGIN_URL, json=auth_input)
         print(auth_token.json())
     except Exception as ex:
@@ -41,23 +40,12 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
     return auth_token.json()
 
-    # user = await authenticate_user(form_data.username, form_data.password)
-    # if not user:
-    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password",)
 
-    # # Если пользователь найден по почте, то создаем для него токен
-    # access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+@router_auth.post("/register")
+async def register_user():
+    pass
 
-    # access_token = create_access_token(
-    #     data={"sub": user.email, "other_custom_data": [1, 2, 3, 4]},
-    #     expires_delta=access_token_expires,
-    # )
 
-    # return {"access_token": access_token, "token_type": "bearer"}
-
-# @router_auth.get("/")
-# async def test_for_auth(userUUID = Depends(get_userUUID_from_token)):
-
-#     """Получить информацию о пользователе по его id"""
-
-#     return JSONResponse({"userUUID": userUUID})
+@router_auth.get("/refreshtokens")
+async def refresh_tokens():
+    pass

@@ -4,7 +4,7 @@ package notes;
 
 
 service Note {
-    rpc CreateNote (stream CreateNoteRequest) returns (CreateNoteResponse);
+    rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse);
     rpc GetNote (GetNoteRequest) returns (GetNoteResponse);
     rpc GetNotes (GetListNotesRequest) returns (GetListNotesResponse);
     rpc CreateCategory (CreateCategoryRequest) returns (CreateCategoryResponse);

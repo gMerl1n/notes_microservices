@@ -121,8 +121,8 @@ class NoteService(notes_pb2_grpc.NoteServicer):
         serialized_category = NotesByCategory.model_validate(category)
 
         user_permission = await verify_permission_category(category_id=serialized_category.category_id, 
-                                                     user_uuid=serialized_category.user_uuid,
-                                                     async_session=settings.async_session)
+                                                           user_uuid=serialized_category.user_uuid,
+                                                           async_session=settings.async_session)
         
         if user_permission is None:
 
