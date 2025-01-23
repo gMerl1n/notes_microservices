@@ -5,7 +5,24 @@ import (
 	"net/http"
 
 	"github.com/gMerl1n/notes_microservices/app/internal/apperrors"
+	"github.com/gMerl1n/notes_microservices/app/internal/auth/services"
+	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
+	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
 )
+
+type Handler struct {
+	services     services.IServiceUser
+	tokenManager jwt.TokenManager
+	logger       *logging.Logger
+}
+
+func NewHandler(services services.IServiceUser, tokenManager jwt.TokenManager, logger *logging.Logger) *Handler {
+	return &Handler{
+		services:     services,
+		tokenManager: tokenManager,
+		logger:       logger,
+	}
+}
 
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 

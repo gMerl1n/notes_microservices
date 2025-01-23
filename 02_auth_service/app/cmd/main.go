@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/gMerl1n/notes_microservices/app/internal/auth"
+	"github.com/gMerl1n/notes_microservices/app/internal/config"
+	"github.com/gMerl1n/notes_microservices/app/pkg/db"
+	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
+	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
+	"github.com/gMerl1n/notes_microservices/app/pkg/redis_client"
 	"github.com/gorilla/mux"
-	"github.com/iriskin77/notes_microservices/app/internal/auth"
-	"github.com/iriskin77/notes_microservices/app/internal/config"
-	"github.com/iriskin77/notes_microservices/app/pkg/db"
-	"github.com/iriskin77/notes_microservices/app/pkg/jwt"
-	"github.com/iriskin77/notes_microservices/app/pkg/logging"
-	"github.com/iriskin77/notes_microservices/app/pkg/redis_client"
 	"github.com/joho/godotenv"
 )
 
