@@ -1,35 +1,33 @@
-package auth
+package repository
 
 import (
 	"context"
 	"fmt"
 
+	"github.com/gMerl1n/notes_microservices/app/internal/auth/domain"
 	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
-
-// type AuthRepository struct {
-// }
 
 const (
 	usersTable = "users"
 )
 
-type Storage interface {
-	CreateUser(ctx context.Context, user User) (string, error)
-	GetByEmail(ctx context.Context, email string) (*User, error)
+type IRepositoryUser interface {
+	CreateUser(ctx context.Context, name, surname, email, hashedPassword string, age int) (string, error)
+	GetByEmail(ctx context.Context, email string) (*domain.User, error)
 }
 
-type Repository struct {
+type RepositoryUser struct {
 	db     *pgxpool.Pool
 	logger *logging.Logger
 }
 
-func NewRepository(db *pgxpool.Pool, logger *logging.Logger) *Repository {
-	return &Repository{db: db, logger: logger}
+func NewRepository(db *pgxpool.Pool, logger *logging.Logger) *RepositoryUser {
+	return &RepositoryUser{db: db, logger: logger}
 }
 
-func (s *Repository) CreateUser(ctx context.Context, user User) (string, error) {
+func (s *RepositoryUser) CreateUser(ctx context.Context, name, surname, email, hashedPassword string, age int) (string, error) {
 
 	var newUserUUID string
 
@@ -47,9 +45,9 @@ func (s *Repository) CreateUser(ctx context.Context, user User) (string, error) 
 	return newUserUUID, nil
 }
 
-func (s *Repository) GetByEmail(ctx context.Context, email string) (*User, error) {
+func (s *RepositoryUser) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
 
-	var user User
+	var user domain.User
 
 	query := fmt.Sprintf("SELECT UUID, email, password_hash FROM %s WHERE email=$1", usersTable)
 
