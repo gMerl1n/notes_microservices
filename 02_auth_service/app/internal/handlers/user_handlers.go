@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gMerl1n/notes_microservices/app/internal/apperrors"
-	"github.com/gMerl1n/notes_microservices/app/internal/auth/services"
+	"github.com/gMerl1n/notes_microservices/app/internal/services"
 	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
 	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
 )
