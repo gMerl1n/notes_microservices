@@ -2,17 +2,20 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
-	"github.com/gMerl1n/notes_microservices/app/internal/auth"
 	"github.com/gMerl1n/notes_microservices/app/internal/config"
 	"github.com/gMerl1n/notes_microservices/app/pkg/db"
 	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
 	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
 	"github.com/gMerl1n/notes_microservices/app/pkg/redis_client"
-	"github.com/gorilla/mux"
+	"github.com/gMerl1n/notes_microservices/app/server"
 	"github.com/joho/godotenv"
 )
 
@@ -43,11 +46,11 @@ func main() {
 	)
 
 	ctx := context.Background()
-	client, err := db.NewPostgresDB(ctx, confDB)
+	// client, err := db.NewPostgresDB(ctx, confDB)
 
-	if err != nil {
-		logger.Fatal(err)
-	}
+	// if err != nil {
+	// 	logger.Fatal(err)
+	// }
 
 	// initializing Redis
 
@@ -60,12 +63,12 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	clientRedis, err := redis_client.NewRedisClient(redisConfig)
-	if err != nil {
-		logger.Fatal(err)
-	}
+	// clientRedis, err := redis_client.NewRedisClient(redisConfig)
+	// if err != nil {
+	// 	logger.Fatal(err)
+	// }
 
-	storeRedis := auth.NewRedisStore(clientRedis)
+	// storeRedis := redis_client.NewRedisStore(clientRedis)
 
 	// initializing tokenManager to generate JWT
 
@@ -74,34 +77,32 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	// initializing server
-	repo := auth.NewRepository(client, &logger)
-	service := auth.NewService(repo, tokenManager, storeRedis, &logger,
-		time.Duration(conf.AccessTokenTTL)*time.Minute,
-		time.Duration(conf.RefreshTokenTTL)*time.Minute)
-
-	h := auth.NewHandler(service, tokenManager, &logger)
-
-	router := mux.NewRouter()
-
-	h.RegisterHandlers(router)
-
-	srv, err := NewHttpServer(router, conf)
+	srv, err := server.NewHttpServer(ctx, logger, conf, confDB, redisConfig, conf.Port, tokenManager)
 
 	if err != nil {
-		logger.Fatal(err)
+
+		return
 	}
 
-	srv.ListenAndServe()
+	stopped := make(chan struct{})
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+		<-sigint
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err = srv.Shutdown(ctx); err != nil {
+			fmt.Println("HTTP Server Shutdown")
+		}
+		close(stopped)
+	}()
 
-}
+	logger.Info("Starting API Server...")
 
-func NewHttpServer(router *mux.Router, cfg *config.Config) (*http.Server, error) {
+	if err = srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+		return
+	}
 
-	return &http.Server{
-		Addr:         cfg.Port,
-		Handler:      router,
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}, nil
+	<-stopped
+
 }
