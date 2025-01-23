@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/gMerl1n/notes_microservices/app/internal/apperrors"
+	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
+	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
 	"github.com/gorilla/mux"
-	"github.com/iriskin77/notes_microservices/app/internal/apperrors"
-	"github.com/iriskin77/notes_microservices/app/pkg/jwt"
-	"github.com/iriskin77/notes_microservices/app/pkg/logging"
 )
 
 type Handler struct {
