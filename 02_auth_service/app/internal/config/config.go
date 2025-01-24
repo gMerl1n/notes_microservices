@@ -35,6 +35,12 @@ type ConfigToken struct {
 	RefreshTokenTTL int
 }
 
+type ConfigUser struct {
+	UserRoleID   int
+	AdminRoleID  int
+	SuperAdminID int
+}
+
 func fetchConfig() error {
 
 	viper.AddConfigPath("config")
@@ -49,6 +55,7 @@ type Config struct {
 	Postgres *ConfigPostgres
 	Redis    *ConfigRedis
 	Token    *ConfigToken
+	User     *ConfigUser
 }
 
 func NewConfig() (*Config, error) {
@@ -89,6 +96,11 @@ func NewConfig() (*Config, error) {
 			AddrRedis:     os.Getenv("REDIS_PORT"),
 			PasswordRedis: os.Getenv("REDIS_PASSWORD"),
 			DBRedis:       dbr,
+		},
+		User: &ConfigUser{
+			UserRoleID:   1,
+			AdminRoleID:  2,
+			SuperAdminID: 3,
 		},
 	}, nil
 }
