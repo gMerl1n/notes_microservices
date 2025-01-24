@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
+	"github.com/gMerl1n/notes_microservices/pkg/logging"
 	"github.com/redis/go-redis/v9"
 )
 

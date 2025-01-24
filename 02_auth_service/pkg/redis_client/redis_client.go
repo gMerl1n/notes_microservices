@@ -3,7 +3,7 @@ package redis_client
 import (
 	"context"
 
-	"github.com/gMerl1n/notes_microservices/app/internal/config"
+	"github.com/gMerl1n/notes_microservices/internal/config"
 	"github.com/redis/go-redis/v9"
 )
 

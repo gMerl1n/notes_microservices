@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gMerl1n/notes_microservices/app/internal/apperrors"
-	"github.com/gMerl1n/notes_microservices/app/internal/services"
-	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
-	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
+	"github.com/gMerl1n/notes_microservices/internal/apperrors"
+	"github.com/gMerl1n/notes_microservices/internal/services"
+	"github.com/gMerl1n/notes_microservices/pkg/jwt"
+	"github.com/gMerl1n/notes_microservices/pkg/logging"
 	"github.com/go-playground/validator/v10"
 )
 

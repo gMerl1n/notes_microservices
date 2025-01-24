@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gMerl1n/notes_microservices/app/internal/config"
-	"github.com/gMerl1n/notes_microservices/app/internal/domain"
-	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
+	"github.com/gMerl1n/notes_microservices/internal/config"
+	"github.com/gMerl1n/notes_microservices/internal/domain"
+	"github.com/gMerl1n/notes_microservices/pkg/logging"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

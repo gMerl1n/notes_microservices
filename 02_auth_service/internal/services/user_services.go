@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gMerl1n/notes_microservices/app/internal/repository"
-	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
-	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
+	"github.com/gMerl1n/notes_microservices/internal/repository"
+	"github.com/gMerl1n/notes_microservices/pkg/jwt"
+	"github.com/gMerl1n/notes_microservices/pkg/logging"
 	"golang.org/x/crypto/bcrypt"
 )
 

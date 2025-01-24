@@ -1,4 +1,4 @@
-FROM golang:1.22-alpine AS builder
+FROM golang:1.23.4-alpine AS builder
 
 WORKDIR /auth_service
 
@@ -8,12 +8,12 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -mod=readonly -o auth_service app/cmd/main.go
+RUN go build -mod=readonly -o auth_service main.go
 
 #./app/cmd/main.go
 
 # Run the binary when the container starts
 
-# CMD ["./auth_service/app/cmd/main"]
+CMD ["./auth_service/main"]
 
 # CMD ["/auth_service"]

@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gMerl1n/notes_microservices/app/internal/config"
+	"github.com/gMerl1n/notes_microservices/internal/config"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func NewPostgresDB(ctx context.Context, cfg *config.ConfigPostgres) (dbpool *pgxpool.Pool, err error) {
 	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.NameDB)
+	fmt.Println("Database string")
+	fmt.Println(dsn)
 	dbpool, err = pgxpool.New(ctx, dsn)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)

@@ -2,17 +2,18 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/gMerl1n/notes_microservices/app/internal/config"
-	"github.com/gMerl1n/notes_microservices/app/internal/handlers"
-	"github.com/gMerl1n/notes_microservices/app/internal/repository"
-	"github.com/gMerl1n/notes_microservices/app/internal/services"
-	"github.com/gMerl1n/notes_microservices/app/pkg/db"
-	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
-	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
-	"github.com/gMerl1n/notes_microservices/app/pkg/redis_client"
+	"github.com/gMerl1n/notes_microservices/internal/config"
+	"github.com/gMerl1n/notes_microservices/internal/handlers"
+	"github.com/gMerl1n/notes_microservices/internal/repository"
+	"github.com/gMerl1n/notes_microservices/internal/services"
+	"github.com/gMerl1n/notes_microservices/pkg/db"
+	"github.com/gMerl1n/notes_microservices/pkg/jwt"
+	"github.com/gMerl1n/notes_microservices/pkg/logging"
+	"github.com/gMerl1n/notes_microservices/pkg/redis_client"
 	"github.com/go-playground/validator/v10"
 
 	"github.com/gorilla/mux"
@@ -26,9 +27,10 @@ func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config
 		log.Fatal(err)
 	}
 
+	fmt.Println(conf.Redis)
 	redisClient, err := redis_client.NewRedisClient(ctx, conf.Redis)
 	if err != nil {
-		log.Fatal("Failed to initialize Redis")
+		log.Fatal("Failed to initialize Redis", err)
 		return nil, err
 	}
 

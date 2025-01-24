@@ -7,13 +7,14 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
-	"github.com/gMerl1n/notes_microservices/app/internal/config"
-	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
-	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
-	"github.com/gMerl1n/notes_microservices/app/server"
+	"github.com/gMerl1n/notes_microservices/internal/config"
+	"github.com/gMerl1n/notes_microservices/pkg/jwt"
+	"github.com/gMerl1n/notes_microservices/pkg/logging"
+	"github.com/gMerl1n/notes_microservices/server"
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 )
@@ -27,7 +28,14 @@ func main() {
 
 	// load .env variables
 
-	if err := godotenv.Load("/home/username/Рабочий стол/notes_microservices/02_auth_service/.env"); err != nil {
+	currentWorkDirectory, err := os.Getwd()
+	if err != nil {
+		logger.Fatal("Failed to get root path ", err)
+	}
+
+	envPath := filepath.Join(currentWorkDirectory, ".env")
+
+	if err := godotenv.Load(envPath); err != nil {
 		logger.Fatal(err)
 	}
 
@@ -43,7 +51,7 @@ func main() {
 	)
 
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatal("Failed to init Token Manager. ", err)
 	}
 
 	ctx := context.Background()
