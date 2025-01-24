@@ -32,7 +32,7 @@ func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config
 		return nil, err
 	}
 
-	redisUser := repository.NewRedisStoreUser(redisClient)
+	redisUser := repository.NewRedisStoreUser(redisClient, log)
 
 	repo := repository.NewRepositoryUser(db, log, conf.User)
 	serv := services.NewServiceUser(repo, tokenManager, redisUser, log, time.Duration(conf.Token.AccessTokenTTL), time.Duration(conf.Token.RefreshTokenTTL))
@@ -42,6 +42,7 @@ func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config
 
 	router.HandleFunc("/api/v1/create_user", h.CreateUser).Methods("POST")
 	router.HandleFunc("/api/v1/login_user", h.LoginUser).Methods("POST")
+	router.HandleFunc("/api/v1/refresh_token", h.RefreshTokens).Methods("POST")
 
 	return &http.Server{
 		Addr:    conf.Server.Port,

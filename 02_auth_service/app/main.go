@@ -14,6 +14,7 @@ import (
 	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
 	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
 	"github.com/gMerl1n/notes_microservices/app/server"
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 )
 
@@ -47,7 +48,9 @@ func main() {
 
 	ctx := context.Background()
 
-	srv, err := server.NewHttpServer(ctx, logger, config, tokenManager)
+	validate := validator.New(validator.WithRequiredStructEnabled())
+
+	srv, err := server.NewHttpServer(ctx, logger, config, tokenManager, validate)
 
 	if err != nil {
 		return
