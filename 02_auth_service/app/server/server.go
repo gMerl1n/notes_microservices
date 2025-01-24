@@ -13,11 +13,12 @@ import (
 	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
 	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
 	"github.com/gMerl1n/notes_microservices/app/pkg/redis_client"
+	"github.com/go-playground/validator/v10"
 
 	"github.com/gorilla/mux"
 )
 
-func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config, tokenManager jwt.TokenManager) (*http.Server, error) {
+func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config, tokenManager jwt.TokenManager, validator *validator.Validate) (*http.Server, error) {
 
 	db, err := db.NewPostgresDB(ctx, conf.Postgres)
 
@@ -33,9 +34,9 @@ func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config
 
 	redisUser := repository.NewRedisStoreUser(redisClient)
 
-	repo := repository.NewRepositoryUser(db, log)
+	repo := repository.NewRepositoryUser(db, log, conf.User)
 	serv := services.NewServiceUser(repo, tokenManager, redisUser, log, time.Duration(conf.Token.AccessTokenTTL), time.Duration(conf.Token.RefreshTokenTTL))
-	h := handlers.NewHandlerUser(serv, tokenManager, log)
+	h := handlers.NewHandlerUser(serv, tokenManager, log, validator)
 
 	router := mux.NewRouter()
 

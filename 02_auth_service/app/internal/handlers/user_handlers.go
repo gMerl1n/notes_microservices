@@ -8,19 +8,22 @@ import (
 	"github.com/gMerl1n/notes_microservices/app/internal/services"
 	"github.com/gMerl1n/notes_microservices/app/pkg/jwt"
 	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
+	"github.com/go-playground/validator/v10"
 )
 
 type HandlerUser struct {
 	services     services.IServiceUser
 	tokenManager jwt.TokenManager
 	logger       *logging.Logger
+	validator    *validator.Validate
 }
 
-func NewHandlerUser(services services.IServiceUser, tokenManager jwt.TokenManager, logger *logging.Logger) *HandlerUser {
+func NewHandlerUser(services services.IServiceUser, tokenManager jwt.TokenManager, logger *logging.Logger, validator *validator.Validate) *HandlerUser {
 	return &HandlerUser{
 		services:     services,
 		tokenManager: tokenManager,
 		logger:       logger,
+		validator:    validator,
 	}
 }
 
@@ -35,6 +38,11 @@ func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&createdUser); err != nil {
 		h.logger.Error("Failed to unmarshal user data %w", err)
 		apperrors.BadRequestError(w, "invalid json schema", 500, err.Error())
+	}
+
+	if err := h.validator.Struct(createdUser); err != nil {
+		h.logger.Warn("Failed to validate user data", err)
+		apperrors.BadRequestError(w, "Incorrect user data", 500, err.Error())
 	}
 
 	userUUID, err := h.services.CreateUser(

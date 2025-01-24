@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gMerl1n/notes_microservices/app/internal/config"
 	"github.com/gMerl1n/notes_microservices/app/internal/domain"
 	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -14,27 +15,28 @@ const (
 )
 
 type IRepositoryUser interface {
-	CreateUser(ctx context.Context, name, surname, email, hashedPassword string, age int) (string, error)
+	CreateUser(ctx context.Context, name, surname, email, hashedPassword string, age int) (int, error)
 	GetByEmail(ctx context.Context, email string) (*domain.User, error)
 }
 
 type RepositoryUser struct {
-	db     *pgxpool.Pool
-	logger *logging.Logger
+	db         *pgxpool.Pool
+	logger     *logging.Logger
+	configUser *config.ConfigUser
 }
 
-func NewRepositoryUser(db *pgxpool.Pool, logger *logging.Logger) *RepositoryUser {
-	return &RepositoryUser{db: db, logger: logger}
+func NewRepositoryUser(db *pgxpool.Pool, logger *logging.Logger, configUser *config.ConfigUser) *RepositoryUser {
+	return &RepositoryUser{db: db, logger: logger, configUser: configUser}
 }
 
-func (s *RepositoryUser) CreateUser(ctx context.Context, name, surname, email, hashedPassword string, age int) (string, error) {
+func (s *RepositoryUser) CreateUser(ctx context.Context, name, surname, email, hashedPassword string, age int) (int, error) {
 
-	var newUserUUID string
+	var userID int
 
 	query := fmt.Sprintf(
-		`INSERT INTO %s (name, surname, age, email, password_hash) 
-		 VALUES ($1, $2, $3, $4, $5) 
-		 RETURNING UUID`,
+		`INSERT INTO %s (name, surname, age, email, password_hash, role_id) 
+		 VALUES ($1, $2, $3, $4, $5, $6) 
+		 RETURNING id`,
 		usersTable,
 	)
 
@@ -44,12 +46,13 @@ func (s *RepositoryUser) CreateUser(ctx context.Context, name, surname, email, h
 		age,
 		email,
 		hashedPassword,
-	).Scan(&newUserUUID); err != nil {
+		s.configUser.UserRoleID,
+	).Scan(&userID); err != nil {
 		fmt.Println(err.Error())
-		return "", err
+		return 0, err
 	}
 
-	return newUserUUID, nil
+	return userID, nil
 }
 
 func (s *RepositoryUser) GetByEmail(ctx context.Context, email string) (*domain.User, error) {

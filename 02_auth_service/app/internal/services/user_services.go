@@ -12,7 +12,7 @@ import (
 )
 
 type IServiceUser interface {
-	CreateUser(ctx context.Context, name, surname, email, password, repeatPassword string, age int) (userUUID string, err error)
+	CreateUser(ctx context.Context, name, surname, email, password, repeatPassword string, age int) (userID int, err error)
 	Login(ctx context.Context, email, password string) (*jwt.Tokens, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (*jwt.Tokens, error)
 }
@@ -44,10 +44,10 @@ func NewServiceUser(
 		refreshTokenTTL: refreshTokenTTL}
 }
 
-func (s *ServiceUser) CreateUser(ctx context.Context, name, surname, email, password, repeatPassword string, age int) (userUUID string, err error) {
+func (s *ServiceUser) CreateUser(ctx context.Context, name, surname, email, password, repeatPassword string, age int) (userID int, err error) {
 	s.logger.Debug("check password and repeat password")
 	if password != repeatPassword {
-		return "", fmt.Errorf("password does not match repeat password")
+		return 0, fmt.Errorf("password does not match repeat password")
 	}
 
 	s.logger.Debug("generate password hash")
@@ -55,17 +55,17 @@ func (s *ServiceUser) CreateUser(ctx context.Context, name, surname, email, pass
 	hashedPassword, err := generatePasswordHash(password)
 	if err != nil {
 		s.logger.Error("failed to generate hashed pass: %w", err)
-		return "", err
+		return 0, err
 	}
 
-	userUUID, err = s.repo.CreateUser(ctx, name, surname, email, hashedPassword, age)
+	userID, err = s.repo.CreateUser(ctx, name, surname, email, hashedPassword, age)
 
 	if err != nil {
 		s.logger.Error("failed to create user: %w", err)
-		return "", err
+		return 0, err
 	}
 
-	return userUUID, nil
+	return userID, nil
 }
 
 func generatePasswordHash(password string) (string, error) {
