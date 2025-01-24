@@ -14,7 +14,7 @@ const (
 	UserContextKey      userCtx = "UserUUID"
 )
 
-func (h *Handler) AuthMiddleware(hf http.HandlerFunc) http.HandlerFunc {
+func (h *HandlerUser) AuthMiddleware(hf http.HandlerFunc) http.HandlerFunc {
 	return func(response http.ResponseWriter, request *http.Request) {
 
 		header := request.Header.Get(AuthorizationHeader)

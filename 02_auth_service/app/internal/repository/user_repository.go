@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gMerl1n/notes_microservices/app/internal/auth/domain"
+	"github.com/gMerl1n/notes_microservices/app/internal/domain"
 	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -23,7 +23,7 @@ type RepositoryUser struct {
 	logger *logging.Logger
 }
 
-func NewRepository(db *pgxpool.Pool, logger *logging.Logger) *RepositoryUser {
+func NewRepositoryUser(db *pgxpool.Pool, logger *logging.Logger) *RepositoryUser {
 	return &RepositoryUser{db: db, logger: logger}
 }
 
@@ -31,12 +31,19 @@ func (s *RepositoryUser) CreateUser(ctx context.Context, name, surname, email, h
 
 	var newUserUUID string
 
-	query := fmt.Sprintf("INSERT INTO %s (UUID, email, password_hash) VALUES ($1, $2, $3) RETURNING UUID", usersTable)
+	query := fmt.Sprintf(
+		`INSERT INTO %s (name, surname, age, email, password_hash) 
+		 VALUES ($1, $2, $3, $4, $5) 
+		 RETURNING UUID`,
+		usersTable,
+	)
 
 	if err := s.db.QueryRow(ctx, query,
-		user.UUID,
-		user.Email,
-		user.Password,
+		name,
+		surname,
+		age,
+		email,
+		hashedPassword,
 	).Scan(&newUserUUID); err != nil {
 		fmt.Println(err.Error())
 		return "", err
@@ -49,7 +56,11 @@ func (s *RepositoryUser) GetByEmail(ctx context.Context, email string) (*domain.
 
 	var user domain.User
 
-	query := fmt.Sprintf("SELECT UUID, email, password_hash FROM %s WHERE email=$1", usersTable)
+	query := fmt.Sprintf(
+		`SELECT UUID, email, password_hash 
+		 FROM %s 
+		 WHERE email=$1`,
+		usersTable)
 
 	if err := s.db.QueryRow(ctx, query,
 		email,

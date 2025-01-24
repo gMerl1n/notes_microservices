@@ -1,19 +1,19 @@
 package handlers
 
 type CreateUserRequest struct {
-	Name           string
-	Surname        string
-	Age            int
-	Email          string
-	Password       string
-	RepeatPassword string
+	Name           string `json:"name" validate:"required"`
+	Surname        string `json:"surname" validate:"required"`
+	Age            int    `json:"age" validate:"required"`
+	Email          string `json:"email" validate:"required"`
+	Password       string `json:"password" validate:"required"`
+	RepeatPassword string `json:"repeat_password" validate:"required"`
 }
 
 type LoginUserRequest struct {
-	Email    string
-	Password string
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 type RefreshTokensRequest struct {
-	Token string
+	Token string `json:"token" validate:"required"`
 }

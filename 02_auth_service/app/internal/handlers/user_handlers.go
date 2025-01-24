@@ -10,21 +10,21 @@ import (
 	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
 )
 
-type Handler struct {
+type HandlerUser struct {
 	services     services.IServiceUser
 	tokenManager jwt.TokenManager
 	logger       *logging.Logger
 }
 
-func NewHandler(services services.IServiceUser, tokenManager jwt.TokenManager, logger *logging.Logger) *Handler {
-	return &Handler{
+func NewHandlerUser(services services.IServiceUser, tokenManager jwt.TokenManager, logger *logging.Logger) *HandlerUser {
+	return &HandlerUser{
 		services:     services,
 		tokenManager: tokenManager,
 		logger:       logger,
 	}
 }
 
-func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
+func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	h.logger.Info("creating user...")
 
@@ -62,7 +62,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
+func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -89,7 +89,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *Handler) RefreshTokens(w http.ResponseWriter, r *http.Request) {
+func (h *HandlerUser) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 

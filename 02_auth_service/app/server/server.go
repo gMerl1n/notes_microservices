@@ -17,29 +17,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewHttpServer(
-	ctx context.Context,
-	log *logging.Logger,
-	conf *config.Config,
-	postgres *db.ConfigPostgres,
-	redisConf *redis_client.ConfigRedis,
-	BindAddr string,
-	tokenManager jwt.TokenManager,
-) (*http.Server, error) {
+func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config, tokenManager jwt.TokenManager) (*http.Server, error) {
 
-	// db, err := repository.NewRepositoryUser(ctx, postgres)
-	// if err != nil {
-	// 	log.Fatal("Failed to initialize DB")
-	// 	return nil, err
-	// }
-
-	db, err := db.NewPostgresDB(ctx, postgres)
+	db, err := db.NewPostgresDB(ctx, conf.Postgres)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	redisClient, err := redis_client.NewRedisClient(redisConf)
+	redisClient, err := redis_client.NewRedisClient(ctx, conf.Redis)
 	if err != nil {
 		log.Fatal("Failed to initialize Redis")
 		return nil, err
@@ -48,7 +34,7 @@ func NewHttpServer(
 	redisUser := repository.NewRedisStoreUser(redisClient)
 
 	repo := repository.NewRepositoryUser(db, log)
-	serv := services.NewServiceUser(repo, tokenManager, redisUser, log, time.Duration(conf.AccessTokenTTL), time.Duration(conf.RefreshTokenTTL))
+	serv := services.NewServiceUser(repo, tokenManager, redisUser, log, time.Duration(conf.Token.AccessTokenTTL), time.Duration(conf.Token.RefreshTokenTTL))
 	h := handlers.NewHandlerUser(serv, tokenManager, log)
 
 	router := mux.NewRouter()
@@ -57,7 +43,7 @@ func NewHttpServer(
 	router.HandleFunc("/api/v1/login_user", h.LoginUser).Methods("POST")
 
 	return &http.Server{
-		Addr:    BindAddr,
+		Addr:    conf.Server.Port,
 		Handler: router,
 	}, nil
 
