@@ -2,14 +2,14 @@ version: "3.9"
 
 services:
 
-  auth_service:
-    build: .
-    container_name: auth_service
-    command: ["./auth_service"]
-    ports:
-      - 10001:10001
-    networks:
-      - mynet
+  # auth_service:
+  #   build: .
+  #   container_name: auth_service
+  #   command: ["./auth_service"]
+  #   ports:
+  #     - 10001:10001
+  #   networks:
+  #     - mynet
 
   db_auth:
     image: postgres
