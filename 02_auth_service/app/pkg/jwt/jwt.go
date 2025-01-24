@@ -16,7 +16,7 @@ type Tokens struct {
 
 // TokenManager provides logic for JWT & Refresh tokens generation and parsing.
 type TokenManager interface {
-	NewJWT(userId string) (string, error)
+	NewJWT(userID string) (string, error)
 	Parse(accessToken string) (string, error)
 	NewRefreshToken() (string, error)
 }
@@ -38,9 +38,9 @@ func NewManager(signingKey string, accessTokenTTL time.Duration, refreshTokenTTL
 		refreshTokenTTL: refreshTokenTTL}, nil
 }
 
-func (m *Manager) NewJWT(userUUID string) (string, error) {
+func (m *Manager) NewJWT(userID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Subject:   userUUID,
+		Subject:   userID,
 		ExpiresAt: time.Now().Add(m.accessTokenTTL).Unix(),
 	})
 

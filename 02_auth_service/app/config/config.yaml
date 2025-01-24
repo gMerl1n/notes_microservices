@@ -1,6 +1,6 @@
 token:
   jwt_secret: $3cr3t
-  access_tokenTTL: 120
+  access_tokenTTL: 820
   refresh_tokenTTL: 43200 #30 days
 
 server:

@@ -60,14 +60,14 @@ func (s *RepositoryUser) GetByEmail(ctx context.Context, email string) (*domain.
 	var user domain.User
 
 	query := fmt.Sprintf(
-		`SELECT UUID, email, password_hash 
+		`SELECT id, email, password_hash 
 		 FROM %s 
 		 WHERE email=$1`,
 		usersTable)
 
 	if err := s.db.QueryRow(ctx, query,
 		email,
-	).Scan(&user.UUID, &user.Email, &user.Password); err != nil {
+	).Scan(&user.ID, &user.Email, &user.Password); err != nil {
 		fmt.Println(err.Error())
 		return nil, err
 	}

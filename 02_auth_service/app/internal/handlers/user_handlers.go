@@ -109,7 +109,7 @@ func (h *HandlerUser) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	newTokens, err := h.services.RefreshTokens(r.Context(), token.Token)
+	newTokens, err := h.services.RefreshTokens(r.Context(), token.RefreshToken)
 	if err != nil {
 		apperrors.BadRequestError(w, "Failed to get new tokens", 500, err.Error())
 	}

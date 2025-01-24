@@ -4,30 +4,34 @@ import (
 	"context"
 	"time"
 
+	"github.com/gMerl1n/notes_microservices/app/pkg/logging"
 	"github.com/redis/go-redis/v9"
 )
 
 type IRedisRepositoryUser interface {
-	SaveUserByToken(ctx context.Context, RefreshToken, userUUID string, expiresAt time.Duration) error
+	SaveUserByToken(ctx context.Context, RefreshToken, userID string, expiresAt time.Duration) error
 	GetUserByToken(ctx context.Context, RefreshToken string) (string, error)
 	RemoveUserByToken(ctx context.Context, RefreshToken string) error
 }
 
 type RedisRepositoryUser struct {
 	client *redis.Client
+	logger *logging.Logger
 }
 
-func NewRedisStoreUser(client *redis.Client) *RedisRepositoryUser {
-	return &RedisRepositoryUser{client: client}
+func NewRedisStoreUser(client *redis.Client, logger *logging.Logger) *RedisRepositoryUser {
+	return &RedisRepositoryUser{client: client, logger: logger}
 }
 
-func (r *RedisRepositoryUser) SaveUserByToken(ctx context.Context, refreshToken, userUUID string, expiresAt time.Duration) error {
+func (r *RedisRepositoryUser) SaveUserByToken(ctx context.Context, refreshToken, userID string, expiresAt time.Duration) error {
 
-	if err := r.client.HSet(ctx, refreshToken, "userUUID", userUUID, "expiresAt", expiresAt).Err(); err != nil {
+	r.logger.Info("Refresh Token:", refreshToken)
+
+	if err := r.client.HSet(ctx, refreshToken, "userID", userID, "expiresAt", expiresAt).Err(); err != nil {
 		return err
 	}
 
-	timeExpireSession := time.Now().Local().Add(10 * time.Second)
+	timeExpireSession := time.Now().Local().Add(10 * time.Minute)
 
 	r.client.ExpireAt(ctx, refreshToken, timeExpireSession)
 
@@ -41,12 +45,14 @@ func (r *RedisRepositoryUser) GetUserByToken(ctx context.Context, refreshToken s
 		return "", err
 	}
 
-	userUUID, ok := sessByRToken["userUUID"]
+	r.logger.Info("User ID from refresh token: ", sessByRToken["userID"])
+
+	userID, ok := sessByRToken["userID"]
 	if !ok {
 		return "", err
 	}
 
-	return userUUID, nil
+	return userID, nil
 }
 
 func (r *RedisRepositoryUser) RemoveUserByToken(ctx context.Context, refreshToken string) error {

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gMerl1n/notes_microservices/app/internal/repository"
@@ -89,7 +90,7 @@ func (s *ServiceUser) Login(ctx context.Context, email, password string) (*jwt.T
 		return nil, err
 	}
 
-	tokens, err := s.createRedisSession(ctx, user.UUID)
+	tokens, err := s.createRedisSession(ctx, strconv.Itoa(user.ID))
 	if err != nil {
 		s.logger.Error("Failed to create session %w", err)
 		return nil, err
@@ -98,14 +99,14 @@ func (s *ServiceUser) Login(ctx context.Context, email, password string) (*jwt.T
 	return tokens, nil
 }
 
-func (s *ServiceUser) createRedisSession(ctx context.Context, userUUID string) (*jwt.Tokens, error) {
+func (s *ServiceUser) createRedisSession(ctx context.Context, userID string) (*jwt.Tokens, error) {
 
 	var (
 		tokens jwt.Tokens
 		err    error
 	)
 
-	tokens.AccessToken, err = s.tokenManager.NewJWT(userUUID)
+	tokens.AccessToken, err = s.tokenManager.NewJWT(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -115,9 +116,9 @@ func (s *ServiceUser) createRedisSession(ctx context.Context, userUUID string) (
 		return nil, err
 	}
 
-	ExpiresAt := time.Duration(s.refreshTokenTTL) * time.Minute
+	ExpiresAt := time.Duration(s.refreshTokenTTL)
 
-	if err := s.redis.SaveUserByToken(ctx, tokens.RefreshToken, userUUID, ExpiresAt); err != nil {
+	if err := s.redis.SaveUserByToken(ctx, tokens.RefreshToken, userID, ExpiresAt); err != nil {
 		return nil, err
 	}
 
@@ -126,7 +127,7 @@ func (s *ServiceUser) createRedisSession(ctx context.Context, userUUID string) (
 
 func (s *ServiceUser) RefreshTokens(ctx context.Context, refreshToken string) (*jwt.Tokens, error) {
 
-	userUUID, err := s.redis.GetUserByToken(ctx, refreshToken)
+	userID, err := s.redis.GetUserByToken(ctx, refreshToken)
 	if err != nil {
 		s.logger.Error("failed to get session by refresh token %w", err)
 		return nil, err
@@ -138,7 +139,7 @@ func (s *ServiceUser) RefreshTokens(ctx context.Context, refreshToken string) (*
 		s.logger.Warn("failed to delete session by refresh token %w", err)
 	}
 
-	newTokens, err := s.createRedisSession(ctx, userUUID)
+	newTokens, err := s.createRedisSession(ctx, userID)
 
 	if err != nil {
 		s.logger.Error("failed to create session with new refresh token %w", err)
