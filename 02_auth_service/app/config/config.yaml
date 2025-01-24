@@ -1,0 +1,9 @@
+token:
+  jwt_secret: $3cr3t
+  access_tokenTTL: 120
+  refresh_tokenTTL: 43200 #30 days
+
+server:
+  host: 0.0.0.0
+  port: ":10001"
+  loglevel: "info"

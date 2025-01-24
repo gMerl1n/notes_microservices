@@ -2,40 +2,19 @@ package redis_client
 
 import (
 	"context"
-	"strconv"
 
+	"github.com/gMerl1n/notes_microservices/app/internal/config"
 	"github.com/redis/go-redis/v9"
 )
 
-type ConfigRedis struct {
-	addrRedis     string
-	passwordRedis string
-	dbRedis       int
-}
-
-func NewRedisConfig(addrRedis string, passwordRedis string, dbRedis string) (*ConfigRedis, error) {
-
-	dbr, err := strconv.Atoi(dbRedis)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &ConfigRedis{
-		addrRedis:     addrRedis,
-		passwordRedis: passwordRedis,
-		dbRedis:       dbr,
-	}, nil
-}
-
-func NewRedisClient(cfg *ConfigRedis) (*redis.Client, error) {
+func NewRedisClient(ctx context.Context, cfg *config.ConfigRedis) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr:     cfg.addrRedis,
-		Password: cfg.passwordRedis,
-		DB:       cfg.dbRedis,
+		Addr:     cfg.AddrRedis,
+		Password: cfg.PasswordRedis,
+		DB:       cfg.DBRedis,
 	})
 
-	err := client.Ping(context.Background()).Err()
+	err := client.Ping(ctx).Err()
 	if err != nil {
 		return nil, err
 	}
