@@ -1,0 +1,9 @@
+server:
+  host: 0.0.0.0
+  port: ":10000"
+  loglevel: "info"
+
+auth_server:
+  create_user_url: "http://localhost:10001/api/v1/create_user"
+  login_user_url: "http://localhost:10001/api/v1/login_user"
+  refresh_token_url: "http://localhost:10001/api/v1/refresh_token"
