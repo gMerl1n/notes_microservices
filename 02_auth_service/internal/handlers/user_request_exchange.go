@@ -15,5 +15,5 @@ type LoginUserRequest struct {
 }
 
 type RefreshTokensRequest struct {
-	RefreshToken string `json:"token" validate:"required"`
+	RefreshToken string `json:"refresh_token" validate:"required"`
 }

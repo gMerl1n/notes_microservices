@@ -70,3 +70,7 @@ func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	w.Write(resp)
 }
+
+func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {}
+
+func (h *HandlerUser) RefreshTokens(w http.ResponseWriter, r *http.Request) {}
