@@ -18,15 +18,20 @@ type ConfigServer struct {
 	LogLevel string
 }
 
+type ConfigToken struct {
+	SigningKey string
+}
+
 type Config struct {
 	Server     *ConfigServer
 	AuthServer *ConfigAuthServer
+	Token      *ConfigToken
 }
 
 func fetchConfig() error {
 
-	viper.AddConfigPath("config")
-	viper.SetConfigName("config")
+	viper.AddConfigPath("configs")
+	viper.SetConfigName("configs")
 	viper.SetConfigType("yaml")
 	return viper.ReadInConfig()
 
@@ -49,6 +54,9 @@ func NewConfig() (*Config, error) {
 			UrlCreateUser:   viper.GetString("auth_server.create_user_url"),
 			UrlLoginUser:    viper.GetString("auth_server.login_user_url"),
 			UrlRefreshToken: viper.GetString("auth_server.refresh_token_url"),
+		},
+		Token: &ConfigToken{
+			SigningKey: viper.GetString("token.jwt_secret"),
 		},
 	}, nil
 }
