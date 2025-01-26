@@ -71,6 +71,28 @@ func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
-func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {}
+func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var loginUser LoginUserRequest
+	defer r.Body.Close()
+	if err := json.NewDecoder(r.Body).Decode(&loginUser); err != nil {
+		h.logger.Error("Failed to unmarshal user data %w", err)
+	}
+
+	tokens, err := h.clientUser.LoginUser(r.Context(), loginUser.Email, loginUser.Password)
+	if err != nil {
+	}
+
+	tokenBytes, err := json.Marshal(tokens)
+	if err != nil {
+		h.logger.Error("Failed to marshal tokens login user %w", err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(tokenBytes)
+
+}
 
 func (h *HandlerUser) RefreshTokens(w http.ResponseWriter, r *http.Request) {}
