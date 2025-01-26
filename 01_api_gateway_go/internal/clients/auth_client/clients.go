@@ -18,7 +18,7 @@ import (
 type IClientUser interface {
 	CreateUser(ctx context.Context, name, surname, email, password, repeatPassword string, age int) (CreateUserResponse, error)
 	LoginUser(ctx context.Context, email, password string) (TokensResponse, error)
-	RefreshTokens(refreshToken string) (TokensResponse, error)
+	RefreshTokens(ctx context.Context, refreshToken string) (TokensResponse, error)
 }
 
 type ClientUser struct {

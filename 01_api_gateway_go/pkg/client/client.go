@@ -14,7 +14,12 @@ type BaseClient struct {
 	Logger     *logging.Logger
 }
 
-func NewBaseClient() {}
+func NewBaseClient(log *logging.Logger) *BaseClient {
+	return &BaseClient{
+		HTTPClient: &http.Client{},
+		Logger:     log,
+	}
+}
 
 func (c *BaseClient) SendRequest(req *http.Request) (*APIResponse, error) {
 	if c.HTTPClient == nil {
