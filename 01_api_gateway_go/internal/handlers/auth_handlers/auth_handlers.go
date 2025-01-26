@@ -95,4 +95,28 @@ func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *HandlerUser) RefreshTokens(w http.ResponseWriter, r *http.Request) {}
+func (h *HandlerUser) RefreshTokens(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var token RefreshTokensRequest
+
+	defer r.Body.Close()
+	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
+		h.logger.Error("Failed to marshal tokens login user %w", err)
+	}
+
+	newTokens, err := h.clientUser.RefreshTokens(r.Context(), token.RefreshToken)
+	if err != nil {
+		h.logger.Error("Failed to refresh tokens login user %w", err)
+	}
+
+	tokenBytes, err := json.Marshal(newTokens)
+	if err != nil {
+		h.logger.Error("Failed to marshal tokens Refresh Tokens user %w", err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(tokenBytes)
+
+}
