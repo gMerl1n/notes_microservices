@@ -11,14 +11,15 @@ import (
 
 type HandlerUser struct {
 	authServer *config.ConfigAuthServer
+	validator  *validator.Validate
 	logger     *logging.Logger
 }
 
-func NewHandlerUser(log *logging.Logger, configAuthServer *config.ConfigAuthServer) *HandlerUser {
+func NewHandlerUser(log *logging.Logger, configAuthServer *config.ConfigAuthServer, validator *validator.Validate) *HandlerUser {
 	return &HandlerUser{
 		authServer: configAuthServer,
-		validator * validator.Validate,
-		logger: log,
+		validator:  validator,
+		logger:     log,
 	}
 }
 
