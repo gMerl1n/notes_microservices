@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gMerl1n/notes_microservices/internal/clients/auth_client"
+	"github.com/gMerl1n/notes_microservices/pkg/apperrors"
 	"github.com/gMerl1n/notes_microservices/pkg/jwt"
 	"github.com/gMerl1n/notes_microservices/pkg/logging"
 	"github.com/go-playground/validator"
@@ -42,6 +43,7 @@ func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&createdUser); err != nil {
 		h.logger.Error("Failed to unmarshal user data %w", err)
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to decode new user data")
 	}
 
 	if err := h.validator.Struct(createdUser); err != nil {
@@ -60,11 +62,13 @@ func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		h.logger.Warn("Failed to make request and register user %w", err)
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to create a new user in DB")
 	}
 
 	resp, err := json.Marshal(userID)
 	if err != nil {
 		h.logger.Error("Failed to marshal userID %w", err)
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to marshal returned user ID")
 	}
 
 	w.WriteHeader(http.StatusCreated)
@@ -79,6 +83,7 @@ func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&loginUser); err != nil {
 		h.logger.Error("Failed to unmarshal user data %w", err)
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to decode login user data")
 	}
 
 	tokens, err := h.clientUser.LoginUser(r.Context(), loginUser.Email, loginUser.Password)
@@ -88,6 +93,7 @@ func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {
 	tokenBytes, err := json.Marshal(tokens)
 	if err != nil {
 		h.logger.Error("Failed to marshal tokens login user %w", err)
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to marshal user tokens")
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -103,12 +109,14 @@ func (h *HandlerUser) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
-		h.logger.Error("Failed to marshal tokens login user %w", err)
+		h.logger.Error("Failed to decode tokens %w", err)
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to decode user tokens")
 	}
 
 	newTokens, err := h.clientUser.RefreshTokens(r.Context(), token.RefreshToken)
 	if err != nil {
 		h.logger.Error("Failed to refresh tokens login user %w", err)
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to refresh tokens")
 	}
 
 	tokenBytes, err := json.Marshal(newTokens)
