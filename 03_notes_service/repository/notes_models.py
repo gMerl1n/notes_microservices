@@ -1,7 +1,6 @@
-import uuid
-from sqlalchemy import Column, String, Integer, Text, TIMESTAMP, ForeignKey
-from app.settings.base import Base
+from settings.base import Base
 from datetime import datetime
+from sqlalchemy import Column, String, Integer, Text, TIMESTAMP, ForeignKey
 
 
 class Note(Base):
