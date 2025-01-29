@@ -2,7 +2,7 @@ import logging
 import uvicorn
 from settings.settings import settings
 from fastapi import FastAPI
-
+from routes import routes
 
 
 # Remove all handlers associated with the root logger object.
@@ -19,6 +19,7 @@ logging.basicConfig(
 
 app = FastAPI()
 
+app.include_router(routes)
 
 if __name__ == "__main__":
     logging.info(f'Start server {settings.server_config.port}')
