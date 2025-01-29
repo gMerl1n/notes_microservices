@@ -1,4 +1,5 @@
-from settings.base import Base
+from app.settings.base import Base
+
 from datetime import datetime
 from sqlalchemy import Column, String, Integer, Text, TIMESTAMP, ForeignKey
 
