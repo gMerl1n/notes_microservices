@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
@@ -18,7 +17,7 @@ import (
 )
 
 type IClientUser interface {
-	CreateUser(ctx context.Context, name, surname, email, password, repeatPassword string, age int) (*models.CreateUserResponse, error)
+	CreateUser(ctx context.Context, createUser *models.CreateUserRequest) ([]byte, error)
 	LoginUser(ctx context.Context, loginUser *models.LoginUserRequest) ([]byte, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (*models.TokensResponse, error)
 }
@@ -41,19 +40,15 @@ func NewClientUser(
 	}
 }
 
-func (c *ClientUser) CreateUser(ctx context.Context, name, surname, email, password, repeatPassword string, age int) (*models.CreateUserResponse, error) {
+func (c *ClientUser) CreateUser(ctx context.Context, createUser *models.CreateUserRequest) ([]byte, error) {
 
-	var newUser models.CreateUserResponse
+	dataByes, err := json.Marshal(createUser)
+	if err != nil {
+		c.logger.Warn("Failed to marshal new user data %w", err)
+		return nil, err
+	}
 
-	data := url.Values{}
-	data.Add("name", name)
-	data.Add("surname", surname)
-	data.Add("email", email)
-	data.Add("password", password)
-	data.Add("repeat_password", repeatPassword)
-	data.Add("age", strconv.Itoa(age))
-
-	req, err := http.NewRequest(http.MethodPost, c.authServer.UrlCreateUser, strings.NewReader(data.Encode()))
+	req, err := http.NewRequest(http.MethodPost, c.authServer.UrlCreateUser, bytes.NewBuffer(dataByes))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new request due to error: %w", err)
 	}
@@ -68,12 +63,16 @@ func (c *ClientUser) CreateUser(ctx context.Context, name, surname, email, passw
 	}
 
 	if response.IsOk {
-		if err = json.NewDecoder(response.Body()).Decode(&newUser); err != nil {
-			return nil, fmt.Errorf("failed to decode body due to error %w", err)
+		responseBytes, err := response.ReadBody()
+		if err != nil {
+			return nil, err
 		}
-		return &newUser, nil
+
+		return responseBytes, nil
+	} else {
+		c.logger.Warn("Bad request", response.StatusCode())
+		return nil, fmt.Errorf("bad request %d", response.StatusCode())
 	}
-	return &newUser, nil
 }
 
 func (c *ClientUser) LoginUser(ctx context.Context, loginUser *models.LoginUserRequest) ([]byte, error) {
@@ -106,11 +105,10 @@ func (c *ClientUser) LoginUser(ctx context.Context, loginUser *models.LoginUserR
 			return nil, err
 		}
 		return tokensBytes, nil
+	} else {
+		c.logger.Warn("Bad request", response.StatusCode())
+		return nil, fmt.Errorf("bad request %d", response.StatusCode())
 	}
-
-	c.logger.Warn("Bad request", response.StatusCode())
-
-	return nil, err
 
 }
 

@@ -52,15 +52,7 @@ func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 		h.logger.Warn("Failed to validate user data %w", err)
 	}
 
-	userID, err := h.clientUser.CreateUser(
-		r.Context(),
-		createdUser.Name,
-		createdUser.Surname,
-		createdUser.Email,
-		createdUser.Password,
-		createdUser.RepeatPassword,
-		createdUser.Age,
-	)
+	userID, err := h.clientUser.CreateUser(r.Context(), &createdUser)
 
 	if err != nil {
 		h.logger.Warn("Failed to make request and register user %w", err)
@@ -83,8 +75,6 @@ func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	var loginUser models.LoginUserRequest
 
-	// json.Unmarshal(r.Body, &loginUser)
-
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&loginUser); err != nil {
 		h.logger.Error("Failed to unmarshal user data %w", err)
@@ -94,12 +84,6 @@ func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {
 	tokens, err := h.clientUser.LoginUser(r.Context(), &loginUser)
 	if err != nil {
 	}
-
-	// tokenBytes, err := json.Marshal(tokens)
-	// if err != nil {
-	// 	h.logger.Error("Failed to marshal tokens login user %w", err)
-	// 	apperrors.BadRequestError(w, "Something wrong", 500, "Failed to marshal user tokens")
-	// }
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(tokens)
