@@ -122,6 +122,7 @@ func (h *HandlerUser) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 	tokenBytes, err := json.Marshal(newTokens)
 	if err != nil {
 		h.logger.Error("Failed to marshal tokens Refresh Tokens user %w", err)
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to refresh tokens")
 	}
 
 	w.WriteHeader(http.StatusOK)
