@@ -1,4 +1,4 @@
-package auth_handlers
+package models
 
 type CreateUserRequest struct {
 	Name           string `json:"name" validate:"required"`
@@ -20,4 +20,9 @@ type LoginUserRequest struct {
 
 type RefreshTokensRequest struct {
 	RefreshToken string `json:"token" validate:"required"`
+}
+
+type TokensResponse struct {
+	AccessToken  string `json:"access_token" validate:"required"`
+	RefreshToken string `json:"refresh_token" validate:"required"`
 }
