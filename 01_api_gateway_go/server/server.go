@@ -10,7 +10,7 @@ import (
 	"github.com/gMerl1n/notes_microservices/pkg/client"
 	"github.com/gMerl1n/notes_microservices/pkg/jwt"
 	"github.com/gMerl1n/notes_microservices/pkg/logging"
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
 
