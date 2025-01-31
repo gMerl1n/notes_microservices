@@ -58,7 +58,7 @@ func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		h.logger.Warn("Failed to register new user")
+		h.logger.Warn("Failed to register new user %w", err)
 		apperrors.BadRequestError(w, "failed to register user", 500, err.Error())
 		return
 	}
