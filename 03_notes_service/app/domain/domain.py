@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Note:
+class NoteEntity:
     note_id: int
     category_id: int
     user_id: int
@@ -13,7 +13,7 @@ class Note:
 
 
 @dataclass
-class Category:
+class CategoryEntity:
     category_id: int
     category_name: str
     user_id: str
