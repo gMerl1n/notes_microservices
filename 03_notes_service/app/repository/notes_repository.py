@@ -4,18 +4,19 @@ from repository.notes_models import Note, Category
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
+
 class INoteRepository(ABC):
 
     @abstractmethod
-    async def get_note_by_id(self, async_session: AsyncSession, note_id: int) -> int:
+    async def get_note_by_id(self, async_session: AsyncSession, note_id: int) -> Note | None:
         raise NotImplemented
 
     @abstractmethod
-    async def get_all_notes(self, async_session: AsyncSession, user_id: int):
+    async def get_all_notes(self, async_session: AsyncSession, user_id: int) -> list[Note]:
         raise NotImplemented
 
     @abstractmethod
-    async def save_note(self, async_session: AsyncSession, note: dict):
+    async def save_note(self, async_session: AsyncSession, note: dict) -> int:
         raise NotImplemented
 
     @abstractmethod
@@ -23,13 +24,13 @@ class INoteRepository(ABC):
         raise NotImplemented
 
     @abstractmethod
-    async def remove_all_notes(self, async_session: AsyncSession, user_id: int):
+    async def remove_all_notes(self, async_session: AsyncSession, user_id: int) -> list[int]:
         raise NotImplemented
 
 
 class NoteRepository(INoteRepository):
 
-    async def get_note_by_id(self, async_session: AsyncSession, note_id: int):
+    async def get_note_by_id(self, async_session: AsyncSession, note_id: int) -> Note | None:
         query = select(Note).where(Note.note_id == note_id)
         note = await async_session.execute(query)
         if note is not None:
@@ -48,5 +49,5 @@ class NoteRepository(INoteRepository):
     async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int:
         pass
 
-    async def remove_all_notes(self, async_session: AsyncSession, user_id: int):
+    async def remove_all_notes(self, async_session: AsyncSession, user_id: int) -> list[int]:
         pass
