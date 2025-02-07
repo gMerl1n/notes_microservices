@@ -34,7 +34,7 @@ settings = Settings()
 
 DATABASE_URL_POSTGRES = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}?async_fallback=True"
 
-engine = create_async_engine(settings.db.DATABASE_URL_POSTGRES, echo=False, future=True)
+engine = create_async_engine(DATABASE_URL_POSTGRES, echo=False, future=True)
 SessionLocal = sessionmaker(autoflush=False, bind=engine, class_=AsyncSession)
 
 
