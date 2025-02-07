@@ -2,16 +2,16 @@ version: "3.9"
 
 services:
 
-  notes_service:
-    build: .
-    container_name: notes_service
-    command: "python3 -m app.cmd.main"
-    ports:
-      - "50052:50052"
-    depends_on:
-      - db_notes
+ notes_service:
+   build: .
+   container_name: notes_service
+   command: "python3 -m app.cmd.main"
+   ports:
+     - "10002:10002"
+   depends_on:
+     - db_notes
 
-  db_notes:
+ db_notes:
     image: postgres
     container_name: db_notes
     volumes:

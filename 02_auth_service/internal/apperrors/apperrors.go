@@ -34,6 +34,7 @@ func SendErrorResponse(w http.ResponseWriter, message *AppError) {
 		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
 	}
 
+	w.WriteHeader(message.Code)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseJSON)
 }

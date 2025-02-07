@@ -1,25 +1,27 @@
-package auth_handlers
+package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
-	"github.com/gMerl1n/notes_microservices/internal/clients/auth_client"
+	"github.com/gMerl1n/notes_microservices/internal/clients"
+	"github.com/gMerl1n/notes_microservices/internal/models"
 	"github.com/gMerl1n/notes_microservices/pkg/apperrors"
 	"github.com/gMerl1n/notes_microservices/pkg/jwt"
 	"github.com/gMerl1n/notes_microservices/pkg/logging"
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 )
 
 type HandlerUser struct {
-	clientUser auth_client.IClientUser
+	clientUser clients.IClientUser
 	jwtParser  jwt.ITokenParser
 	validator  *validator.Validate
 	logger     *logging.Logger
 }
 
 func NewHandlerUser(
-	clientUser auth_client.IClientUser,
+	clientUser clients.IClientUser,
 	jwtParser jwt.ITokenParser,
 	validator *validator.Validate,
 	logger *logging.Logger) *HandlerUser {
@@ -39,7 +41,7 @@ func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var createdUser CreateUserRequest
+	var createdUser models.CreateUserRequest
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&createdUser); err != nil {
 		h.logger.Error("Failed to unmarshal user data %w", err)
@@ -50,15 +52,7 @@ func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 		h.logger.Warn("Failed to validate user data %w", err)
 	}
 
-	userID, err := h.clientUser.CreateUser(
-		r.Context(),
-		createdUser.Name,
-		createdUser.Surname,
-		createdUser.Email,
-		createdUser.Password,
-		createdUser.RepeatPassword,
-		createdUser.Age,
-	)
+	userID, err := h.clientUser.CreateUser(r.Context(), &createdUser)
 
 	if err != nil {
 		h.logger.Warn("Failed to make request and register user %w", err)
@@ -79,25 +73,20 @@ func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var loginUser LoginUserRequest
+	var loginUser models.LoginUserRequest
+
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&loginUser); err != nil {
 		h.logger.Error("Failed to unmarshal user data %w", err)
 		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to decode login user data")
 	}
-
-	tokens, err := h.clientUser.LoginUser(r.Context(), loginUser.Email, loginUser.Password)
+	fmt.Println(loginUser)
+	tokens, err := h.clientUser.LoginUser(r.Context(), &loginUser)
 	if err != nil {
-	}
-
-	tokenBytes, err := json.Marshal(tokens)
-	if err != nil {
-		h.logger.Error("Failed to marshal tokens login user %w", err)
-		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to marshal user tokens")
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(tokenBytes)
+	w.Write(tokens)
 
 }
 
@@ -105,7 +94,7 @@ func (h *HandlerUser) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var token RefreshTokensRequest
+	var token models.RefreshTokensRequest
 
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
@@ -122,6 +111,7 @@ func (h *HandlerUser) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 	tokenBytes, err := json.Marshal(newTokens)
 	if err != nil {
 		h.logger.Error("Failed to marshal tokens Refresh Tokens user %w", err)
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to refresh tokens")
 	}
 
 	w.WriteHeader(http.StatusOK)
