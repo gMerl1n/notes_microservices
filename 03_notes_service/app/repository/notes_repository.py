@@ -4,7 +4,6 @@ from repository.notes_models import Note, Category
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-
 class INoteRepository(ABC):
 
     @abstractmethod

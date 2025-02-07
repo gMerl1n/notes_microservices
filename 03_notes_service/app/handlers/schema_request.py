@@ -7,5 +7,3 @@ class NoteCreateRequest(BaseModel):
     category_name: str
     title: str
     body: str
-
-

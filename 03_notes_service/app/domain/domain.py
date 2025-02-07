@@ -8,8 +8,8 @@ class NoteEntity:
     user_id: int
     title: str
     body: str
-    update_at: float
-    created_at: float
+    update_at: int
+    created_at: int
 
 
 @dataclass
@@ -17,5 +17,5 @@ class CategoryEntity:
     category_id: int
     category_name: str
     user_id: str
-    update_at: float
-    created_at: float
+    update_at: int
+    created_at: int

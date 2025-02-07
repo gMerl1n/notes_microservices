@@ -5,7 +5,6 @@ from sqlalchemy import Column, String, Integer, Text, TIMESTAMP, ForeignKey
 
 
 class Note(Base):
-
     __tablename__ = "notes"
 
     note_id = Column(Integer, primary_key=True, unique=True)
@@ -17,9 +16,7 @@ class Note(Base):
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.timestamp)
 
 
-
 class Category(Base):
-
     __tablename__ = "categories"
 
     category_id = Column(Integer, primary_key=True, unique=True)

@@ -22,7 +22,7 @@ class NoteService(INoteService):
 
     def get_note_by_id(self, async_session: AsyncSession, note_id: int) -> NoteEntity | None:
         note = self.__notes_repo.get_note_by_id(async_session=async_session,
-                                                      note_id=note_id)
+                                                note_id=note_id)
         if note is not None:
             return NoteEntity(note)
 
