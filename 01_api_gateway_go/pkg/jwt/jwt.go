@@ -16,7 +16,7 @@ type TokenParser struct {
 	signingKey string
 }
 
-func NewManager(signingKey string) (*TokenParser, error) {
+func NewTokenParser(signingKey string) (*TokenParser, error) {
 	if signingKey == "" {
 		return nil, errors.New("empty signing key")
 	}
