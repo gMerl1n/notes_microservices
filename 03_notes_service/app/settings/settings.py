@@ -1,3 +1,4 @@
+import json
 import os
 from pydantic import BaseModel
 from pathlib import Path
@@ -15,6 +16,17 @@ POSTGRES_DB = os.environ.get("POSTGRES_DB")
 POSTGRES_USER = os.environ.get("POSTGRES_USER")
 POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 
+DATABASE_URL_POSTGRES = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}?async_fallback=True"
+
+engine = create_async_engine(DATABASE_URL_POSTGRES, echo=False, future=True)
+SessionLocal = sessionmaker(autoflush=False, bind=engine, class_=AsyncSession)
+
+config_path = os.path.join(BASE_DIR, 'settings', "config.json")
+
+with open(config_path) as file:
+    config = json.load(file)
+    server_config = config["server"]
+
 
 class ServerConfig(BaseModel):
     port: int
@@ -22,12 +34,7 @@ class ServerConfig(BaseModel):
 
 
 class Settings:
-    server_config = ServerConfig(port=9898, log_level="info")
+    server_config = ServerConfig(port=server_config["port"], log_level=server_config["log_level"])
 
 
-settings = Settings()
-
-DATABASE_URL_POSTGRES = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}?async_fallback=True"
-
-engine = create_async_engine(DATABASE_URL_POSTGRES, echo=False, future=True)
-SessionLocal = sessionmaker(autoflush=False, bind=engine, class_=AsyncSession)
+config = Settings()
