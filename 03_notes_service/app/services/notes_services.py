@@ -13,6 +13,10 @@ class INoteService(ABC):
         pass
 
     @abstractmethod
+    async def get_all_notes(self, async_session: AsyncSession, user_id: int) -> list[NoteEntity] | None:
+        raise NotImplemented
+
+    @abstractmethod
     async def save_note(self, async_session: AsyncSession, note: dict) -> int:
         pass
 
@@ -28,6 +32,10 @@ class NoteService(INoteService):
                                                 note_id=note_id)
         if note is not None:
             return NoteEntity(**note)
+
+    async def get_all_notes(self, async_session: AsyncSession, user_id: int) -> list[NoteEntity] | None:
+        notes = await self.__notes_repo.get_all_notes(async_session=async_session, user_id=user_id)
+        return notes
 
     async def save_note(self, async_session: AsyncSession, note: dict) -> int:
 

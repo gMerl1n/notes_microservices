@@ -12,7 +12,7 @@ class INoteRepository(ABC):
         raise NotImplemented
 
     @abstractmethod
-    async def get_all_notes(self, async_session: AsyncSession, user_id: int) -> list[Note]:
+    async def get_all_notes(self, async_session: AsyncSession, user_id: int) -> list[NoteEntity] | None:
         raise NotImplemented
 
     @abstractmethod
@@ -36,8 +36,28 @@ class NoteRepository(INoteRepository):
         if note is not None:
             return note.fetchone()
 
-    async def get_all_notes(self, async_session: AsyncSession, user_id: int):
-        pass
+    async def get_all_notes(self, async_session: AsyncSession, user_id: int) -> list[NoteEntity] | None:
+
+        result: list[NoteEntity] = []
+
+        query = select(Note).where(Note.user_id == user_id)
+        notes = await async_session.execute(query)
+        if notes is not None:
+
+            for note in notes.scalars():
+                result.append(
+                    NoteEntity(
+                        id=note.id,
+                        category_id=note.category_id,
+                        user_id=note.user_id,
+                        title=note.title,
+                        body=note.body,
+                        update_at=int(note.update_at.timestamp()),
+                        created_at=int(note.update_at.timestamp()),
+                    )
+                )
+
+            return result
 
     async def save_note(self, async_session: AsyncSession, note: NoteEntity) -> int:
         new_note = Note.to_note_model(note)
