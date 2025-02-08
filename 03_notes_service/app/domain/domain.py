@@ -4,13 +4,13 @@ from typing import Optional
 
 @dataclass
 class NoteEntity:
-    id: Optional[int] = field(init=False, default=None)
     category_id: int
     user_id: int
     title: str
     body: str
     update_at: int
     created_at: int
+    id: Optional[int] = field(default=None)
 
     def to_dict(self):
         return self.__dict__
@@ -22,11 +22,11 @@ class NoteEntity:
 
 @dataclass
 class CategoryEntity:
-    id: Optional[int] = field(init=False, default=None)
     category_name: str
-    user_id: str
+    user_id: int
     update_at: int
     created_at: int
+    id: Optional[int] = field(default=None)
 
     def to_dict(self):
         return self.__dict__
