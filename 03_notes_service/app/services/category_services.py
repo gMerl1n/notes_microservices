@@ -15,6 +15,13 @@ class ICategoryService(ABC):
     async def get_category_by_id(self, async_session: AsyncSession, category_id: int) -> CategoryEntity:
         pass
 
+    @abstractmethod
+    async def get_categories(self, async_session: AsyncSession, user_id: int) -> list[CategoryEntity] | None:
+        pass
+
+    @abstractmethod
+    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int | None:
+        pass
 
 class CategoryService(ICategoryService):
 
@@ -37,3 +44,12 @@ class CategoryService(ICategoryService):
 
         category = await self.__category_repo.get_category_by_id(async_session=async_session, category_id=category_id)
         return category
+
+    async def get_categories(self, async_session: AsyncSession, user_id: int) -> list[CategoryEntity] | None:
+        categories = await self.__category_repo.get_categories(async_session=async_session, user_id=user_id)
+        return categories
+
+    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int | None:
+        removed_category_id = await self.__category_repo.remove_category_by_id(async_session=async_session,
+                                                                               category_id=category_id)
+        return removed_category_id
