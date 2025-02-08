@@ -20,6 +20,13 @@ class INoteService(ABC):
     async def save_note(self, async_session: AsyncSession, note: dict) -> int:
         pass
 
+    @abstractmethod
+    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int | None:
+        raise NotImplemented
+
+    @abstractmethod
+    async def remove_all_notes(self, async_session: AsyncSession, user_id: int) -> list[int] | None:
+        raise NotImplemented
 
 class NoteService(INoteService):
 
@@ -55,3 +62,12 @@ class NoteService(INoteService):
 
         id_note = await self.__notes_repo.save_note(async_session=async_session, note=new_note)
         return id_note
+
+    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int | None:
+        removed_note_id = await self.__notes_repo.remove_note_by_id(async_session=async_session,
+                                                                    note_id=note_id)
+        return removed_note_id
+
+    async def remove_all_notes(self, async_session: AsyncSession, user_id: int) -> list[int] | None:
+        removed_notes_ids = await self.__notes_repo.remove_all_notes(async_session=async_session, user_id=user_id)
+        return removed_notes_ids

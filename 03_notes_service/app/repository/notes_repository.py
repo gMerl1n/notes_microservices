@@ -20,11 +20,11 @@ class INoteRepository(ABC):
         raise NotImplemented
 
     @abstractmethod
-    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int:
+    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int | None:
         raise NotImplemented
 
     @abstractmethod
-    async def remove_all_notes(self, async_session: AsyncSession, user_id: int) -> list[int]:
+    async def remove_all_notes(self, async_session: AsyncSession, user_id: int) -> list[int] | None:
         raise NotImplemented
 
 
@@ -33,8 +33,10 @@ class NoteRepository(INoteRepository):
     async def get_note_by_id(self, async_session: AsyncSession, note_id: int) -> Note | None:
         query = select(Note).where(Note.id == note_id)
         note = await async_session.execute(query)
-        if note is not None:
-            return note.fetchone()
+        if note is None:
+            return
+
+        return note.fetchone()
 
     async def get_all_notes(self, async_session: AsyncSession, user_id: int) -> list[NoteEntity] | None:
 
@@ -42,22 +44,24 @@ class NoteRepository(INoteRepository):
 
         query = select(Note).where(Note.user_id == user_id)
         notes = await async_session.execute(query)
-        if notes is not None:
 
-            for note in notes.scalars():
-                result.append(
-                    NoteEntity(
-                        id=note.id,
-                        category_id=note.category_id,
-                        user_id=note.user_id,
-                        title=note.title,
-                        body=note.body,
-                        update_at=int(note.update_at.timestamp()),
-                        created_at=int(note.update_at.timestamp()),
-                    )
+        if notes is None:
+            return
+
+        for note in notes.scalars():
+            result.append(
+                NoteEntity(
+                    id=note.id,
+                    category_id=note.category_id,
+                    user_id=note.user_id,
+                    title=note.title,
+                    body=note.body,
+                    update_at=int(note.update_at.timestamp()),
+                    created_at=int(note.update_at.timestamp()),
                 )
+            )
 
-            return result
+        return result
 
     async def save_note(self, async_session: AsyncSession, note: NoteEntity) -> int:
         new_note = Note.to_note_model(note)
@@ -66,10 +70,23 @@ class NoteRepository(INoteRepository):
         await async_session.refresh(new_note)
         return new_note.id
 
-    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int:
-        # TODO
-        pass
+    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int | None:
+        query = delete(Note).where(Note.id == note_id).returning(Note.id)
+        removed_note_id = await async_session.execute(query)
+        if removed_note_id is None:
+            return
 
-    async def remove_all_notes(self, async_session: AsyncSession, user_id: int) -> list[int]:
-        # TODO
-        pass
+        await async_session.commit()
+        removed_note_id = removed_note_id.scalar()
+
+        return removed_note_id
+
+    async def remove_all_notes(self, async_session: AsyncSession, user_id: int) -> list[int] | None:
+        query = delete(Note).where(Note.user_id == user_id).returning(Note.id)
+        removed_note_ids = await async_session.execute(query)
+        if removed_note_ids is None:
+            return
+
+        await async_session.commit()
+
+        return removed_note_ids.scalars().all()
