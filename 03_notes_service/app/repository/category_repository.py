@@ -24,7 +24,7 @@ class ICategoryRepository(ABC):
         pass
 
     @abstractmethod
-    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int:
+    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int | None:
         pass
 
 class CategoryRepository(ICategoryRepository):
@@ -59,32 +59,35 @@ class CategoryRepository(ICategoryRepository):
         if category is not None:
             return category.scalar().id
 
-    async def get_categories(self, async_session: AsyncSession, user_id: int) -> list[CategoryEntity]:
+    async def get_categories(self, async_session: AsyncSession, user_id: int) -> list[CategoryEntity] | None:
 
         result: list[CategoryEntity] = []
 
         query = select(Category).where(Category.user_id == user_id)
         categories = await async_session.execute(query)
-        if categories is not None:
+        if categories is None:
+            return
 
-            for category in categories.scalars():
-                result.append(
-                    CategoryEntity(
-                        id=category.id,
-                        category_name=category.category_name,
-                        user_id=category.user_id,
-                        update_at=int(category.update_at.timestamp()),
-                        created_at=int(category.created_at.timestamp()),
-                    )
+        for category in categories.scalars():
+            result.append(
+                CategoryEntity(
+                    id=category.id,
+                    category_name=category.category_name,
+                    user_id=category.user_id,
+                    update_at=int(category.update_at.timestamp()),
+                    created_at=int(category.created_at.timestamp()),
                 )
+            )
 
-            return result
+        return result
 
-    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int:
+    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int | None:
 
         query = delete(Category).where(Category.id == category_id).returning(Category.id)
         removed_category_id = await async_session.execute(query)
-        print(removed_category_id)
-        if removed_category_id is not None:
-            return removed_category_id
+        if removed_category_id is None:
+            return
+        await async_session.commit()
+
+        return removed_category_id.scalar()
 
