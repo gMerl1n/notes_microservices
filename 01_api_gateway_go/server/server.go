@@ -19,7 +19,7 @@ func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config
 	baseClient := client.NewBaseClient(log)
 
 	// Инициализация клиентов
-	clients := clients.NewClient(baseClient, log, conf.AuthServer)
+	clients := clients.NewClient(baseClient, log, conf)
 
 	// Инициализация ручек
 	handlers := handlers.NewHandlers(clients.UserClient, jwtParser, validator, log)
