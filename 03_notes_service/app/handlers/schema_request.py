@@ -8,20 +8,26 @@ class NoteCreateRequest(BaseModel):
     body: str
 
 
-class NoteGetRequest(BaseModel):
+class NoteGetRequestById(BaseModel):
     note_id: int
     user_id: int
+
+
+class NoteRemoveRequestById(BaseModel):
+    note_id: int
+    user_id: int
+
 
 class CategoryCreateRequest(BaseModel):
     category_name: str
     user_id: int
 
 
-class CategoryGetRequest(BaseModel):
+class CategoryGetRequestById(BaseModel):
     category_id: int
     user_id: int
 
 
-class CategoryRemoveRequest(BaseModel):
+class CategoryRemoveRequestById(BaseModel):
     category_id: int
     user_id: int
