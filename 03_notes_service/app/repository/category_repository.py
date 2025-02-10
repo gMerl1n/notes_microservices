@@ -56,8 +56,14 @@ class CategoryRepository(ICategoryRepository):
 
         query = select(Category).where(Category.category_name == category_name)
         category = await async_session.execute(query)
-        if category is not None:
-            return category.scalar().id
+        if category is None:
+            return
+
+        category_scalar = category.scalar()
+        if category_scalar is None:
+            return
+
+        return category_scalar.id
 
     async def get_categories(self, async_session: AsyncSession, user_id: int) -> list[CategoryEntity] | None:
 
