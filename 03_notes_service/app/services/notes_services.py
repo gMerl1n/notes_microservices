@@ -9,7 +9,7 @@ from domain.domain import NoteEntity
 class INoteService(ABC):
 
     @abstractmethod
-    async def get_note_by_id(self, async_session: AsyncSession, note_id: int) -> int | None:
+    async def get_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> NoteEntity | None:
         pass
 
     @abstractmethod
@@ -17,7 +17,12 @@ class INoteService(ABC):
         raise NotImplemented
 
     @abstractmethod
-    async def save_note(self, async_session: AsyncSession, note: dict) -> int:
+    async def save_note(self,
+                        async_session: AsyncSession,
+                        title: str,
+                        body: str,
+                        category_name: str,
+                        user_id: int) -> int:
         pass
 
     @abstractmethod
@@ -34,9 +39,9 @@ class NoteService(INoteService):
         self.__notes_repo = notes_repo
         self.__categories_repo = categories_repo
 
-    async def get_note_by_id(self, async_session: AsyncSession, note_id: int) -> NoteEntity | None:
+    async def get_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> NoteEntity | None:
         note = await self.__notes_repo.get_note_by_id(async_session=async_session,
-                                                note_id=note_id)
+                                                      note_id=note_id)
         if note is not None:
             return NoteEntity(**note)
 
@@ -44,18 +49,21 @@ class NoteService(INoteService):
         notes = await self.__notes_repo.get_all_notes(async_session=async_session, user_id=user_id)
         return notes
 
-    async def save_note(self, async_session: AsyncSession, note: dict) -> int:
+    async def save_note(self,
+                        async_session: AsyncSession,
+                        title: str,
+                        body: str,
+                        category_name: str,
+                        user_id: int) -> int:
 
         category_id = await self.__categories_repo.get_category_id_by_name(async_session=async_session,
-                                                                           category_name=note["category_name"])
-        note.pop("category_name")
-        note["category_id"] = category_id
+                                                                           category_name=category_name)
 
         new_note = NoteEntity(
             category_id=category_id,
-            user_id=note["user_id"],
-            title=note["title"],
-            body=note["body"],
+            user_id=user_id,
+            title=title,
+            body=body,
             update_at=int(datetime.now().timestamp()),
             created_at=int(datetime.now().timestamp()),
         )

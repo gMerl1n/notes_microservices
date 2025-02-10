@@ -8,7 +8,7 @@ from domain.domain import NoteEntity
 class INoteRepository(ABC):
 
     @abstractmethod
-    async def get_note_by_id(self, async_session: AsyncSession, note_id: int) -> Note | None:
+    async def get_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> Note | None:
         raise NotImplemented
 
     @abstractmethod
@@ -20,7 +20,7 @@ class INoteRepository(ABC):
         raise NotImplemented
 
     @abstractmethod
-    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int | None:
+    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> int | None:
         raise NotImplemented
 
     @abstractmethod
@@ -30,8 +30,8 @@ class INoteRepository(ABC):
 
 class NoteRepository(INoteRepository):
 
-    async def get_note_by_id(self, async_session: AsyncSession, note_id: int) -> Note | None:
-        query = select(Note).where(Note.id == note_id)
+    async def get_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> Note | None:
+        query = select(Note).where(and_(Note.id == note_id, Note.user_id == user_id))
         note = await async_session.execute(query)
         if note is None:
             return
@@ -70,8 +70,8 @@ class NoteRepository(INoteRepository):
         await async_session.refresh(new_note)
         return new_note.id
 
-    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int | None:
-        query = delete(Note).where(Note.id == note_id).returning(Note.id)
+    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> int | None:
+        query = delete(Note).where(and_(Note.id == note_id, Note.user_id == user_id)).returning(Note.id)
         removed_note_id = await async_session.execute(query)
         if removed_note_id is None:
             return
