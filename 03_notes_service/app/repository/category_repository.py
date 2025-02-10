@@ -12,7 +12,7 @@ class ICategoryRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_category_by_id(self, async_session: AsyncSession, category_id: int) -> CategoryEntity:
+    async def get_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> CategoryEntity:
         pass
 
     @abstractmethod
@@ -24,7 +24,7 @@ class ICategoryRepository(ABC):
         pass
 
     @abstractmethod
-    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int | None:
+    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> int | None:
         pass
 
 class CategoryRepository(ICategoryRepository):
@@ -37,8 +37,8 @@ class CategoryRepository(ICategoryRepository):
         await async_session.refresh(new_category)
         return new_category.id
 
-    async def get_category_by_id(self, async_session: AsyncSession, category_id: int) -> CategoryEntity:
-        query = select(Category).where(Category.id == category_id)
+    async def get_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> CategoryEntity:
+        query = select(Category).where(and_(Category.id == category_id, Category.user_id == user_id))
         category_obj = await async_session.execute(query)
         if category_obj is not None:
 
@@ -87,9 +87,9 @@ class CategoryRepository(ICategoryRepository):
 
         return result
 
-    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int | None:
+    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> int | None:
 
-        query = delete(Category).where(Category.id == category_id).returning(Category.id)
+        query = delete(Category).where(and_(Category.id == category_id, Category.user_id == user_id)).returning(Category.id)
         removed_category_id = await async_session.execute(query)
         if removed_category_id is None:
             return

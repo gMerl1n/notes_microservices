@@ -12,7 +12,7 @@ class ICategoryService(ABC):
         pass
 
     @abstractmethod
-    async def get_category_by_id(self, async_session: AsyncSession, category_id: int) -> CategoryEntity:
+    async def get_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> CategoryEntity:
         pass
 
     @abstractmethod
@@ -20,7 +20,7 @@ class ICategoryService(ABC):
         pass
 
     @abstractmethod
-    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int | None:
+    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> int | None:
         pass
 
 class CategoryService(ICategoryService):
@@ -40,7 +40,7 @@ class CategoryService(ICategoryService):
         category_id = await self.__category_repo.create_category(async_session=async_session, category=new_category)
         return category_id
 
-    async def get_category_by_id(self, async_session: AsyncSession, category_id: int) -> CategoryEntity | None:
+    async def get_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> CategoryEntity:
 
         category = await self.__category_repo.get_category_by_id(async_session=async_session, category_id=category_id)
         return category
@@ -49,7 +49,7 @@ class CategoryService(ICategoryService):
         categories = await self.__category_repo.get_categories(async_session=async_session, user_id=user_id)
         return categories
 
-    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int | None:
+    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> int | None:
         removed_category_id = await self.__category_repo.remove_category_by_id(async_session=async_session,
                                                                                category_id=category_id)
         return removed_category_id
