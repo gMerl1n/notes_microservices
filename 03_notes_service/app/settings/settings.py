@@ -16,10 +16,15 @@ POSTGRES_DB = os.environ.get("POSTGRES_DB")
 POSTGRES_USER = os.environ.get("POSTGRES_USER")
 POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 
-DATABASE_URL_POSTGRES = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}?async_fallback=True"
+DATABASE_URL_POSTGRES = (f"postgresql+asyncpg://"
+                         f"{POSTGRES_USER}:"
+                         f"{POSTGRES_PASSWORD}@"
+                         f"{POSTGRES_HOST}:{
+                         POSTGRES_PORT}/"
+                         f"{POSTGRES_DB}?async_fallback=True")
 
 engine = create_async_engine(DATABASE_URL_POSTGRES, echo=False, future=True)
-SessionLocal = sessionmaker(autoflush=False, bind=engine, class_=AsyncSession)
+session_local = sessionmaker(autoflush=False, bind=engine, class_=AsyncSession)
 
 config_path = os.path.join(BASE_DIR, 'settings', "config.json")
 
