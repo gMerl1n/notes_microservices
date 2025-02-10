@@ -10,3 +10,15 @@ auth_server:
   create_user_url: "http://localhost:10001/api/v1/create_user"
   login_user_url: "http://localhost:10001/api/v1/login_user"
   refresh_token_url: "http://localhost:10001/api/v1/refresh_token"
+
+notes_server:
+  create_note_url: "http://localhost:10003/create_note"
+  get_note_by_id: "http://localhost:10003/get_note"
+  get_notes: "http://localhost:10003/get_notes"
+  remove_note_by_id: "http://localhost:10003/remove_note"
+  remove_notes: "http://localhost:10003/remove_notes"
+
+  create_category: "http://localhost:10003/create_category"
+  get_category_by_id: "http://localhost:10003/get_category"
+  get_categories: "http://localhost:10003/get_all_categories"
+  remove_category_by_id: "http://localhost:10003/remove_category_by_id"
