@@ -7,7 +7,7 @@ services:
    container_name: notes_service
    command: "python3 -m app.cmd.main"
    ports:
-     - "10002:10002"
+     - "10003:10003"
    depends_on:
      - db_notes
 
@@ -21,6 +21,12 @@ services:
       - .env
     ports:
     - "5444:5432"
-  
+    networks:
+      - custom
+
 volumes:
   data_notes:
+
+networks:
+  custom:
+    driver: bridge

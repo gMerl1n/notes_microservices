@@ -3,7 +3,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from app.settings.base import Base
-from app.repository.notes_models import Category, Note
+from app.repository.models import Category, Note
 from alembic import context
 from app.settings.settings import DATABASE_URL_POSTGRES
 
