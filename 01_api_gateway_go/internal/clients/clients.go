@@ -8,14 +8,16 @@ import (
 )
 
 type Client struct {
-	UserClient        IClientUser
-	NotesServerClient *notes_server_clients.NotesServerClients
+	UserClient       IClientUser
+	NotesClient      notes_server_clients.IClientNotes
+	CategoriesClient notes_server_clients.IClientCategories
 }
 
 func NewClient(baseClient *client.BaseClient, log *logging.Logger, config *config.Config) *Client {
 
 	return &Client{
-		UserClient:        NewClientUser(baseClient, log, config.AuthServer),
-		NotesServerClient: notes_server_clients.NewNotesServerClients(baseClient, log, config),
+		UserClient:       NewClientUser(baseClient, log, config.AuthServer),
+		NotesClient:      notes_server_clients.NewClientNotes(baseClient, log, config.NotesServer),
+		CategoriesClient: notes_server_clients.NewClientCategories(baseClient, log, config.NotesServer),
 	}
 }

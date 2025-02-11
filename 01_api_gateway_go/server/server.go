@@ -22,7 +22,7 @@ func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config
 	clients := clients.NewClient(baseClient, log, conf)
 
 	// Инициализация ручек
-	handlers := handlers.NewHandlers(clients.UserClient, jwtParser, validator, log)
+	handlers := handlers.NewHandlers(clients.UserClient, clients.NotesClient, jwtParser, validator, log)
 
 	router := mux.NewRouter()
 
@@ -32,6 +32,7 @@ func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config
 	router.HandleFunc("/api_gateway/v1/refresh_token", handlers.HandlersUser.RefreshTokens).Methods("POST")
 
 	// notices handlers
+	router.HandleFunc("/api_gateway/v1/create_note", handlers.HandlersNotes.CreateNote).Methods("POST")
 
 	return &http.Server{
 		Addr:    conf.Server.Port,
