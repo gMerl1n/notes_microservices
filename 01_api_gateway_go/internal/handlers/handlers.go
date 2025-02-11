@@ -9,19 +9,22 @@ import (
 )
 
 type Handlers struct {
-	HandlersUser  *HandlerUser
-	HandlersNotes *HandlerNotes
+	HandlersUser      *HandlerUser
+	HandlersNotes     *HandlerNotes
+	HandlerCategories *HandlerCategories
 }
 
 func NewHandlers(
 	clientUser clients.IClientUser,
 	clientNotes notes_server_clients.IClientNotes,
+	clientCategories notes_server_clients.IClientCategories,
 	jwtParser jwt.ITokenParser,
 	validator *validator.Validate,
 	logger *logging.Logger) *Handlers {
 
 	return &Handlers{
-		HandlersUser:  NewHandlerUser(clientUser, jwtParser, validator, logger),
-		HandlersNotes: NewHandlerNotes(clientNotes, jwtParser, validator, logger),
+		HandlersUser:      NewHandlerUser(clientUser, jwtParser, validator, logger),
+		HandlersNotes:     NewHandlerNotes(clientNotes, jwtParser, validator, logger),
+		HandlerCategories: NewHandlerCategories(clientCategories, jwtParser, validator, logger),
 	}
 }

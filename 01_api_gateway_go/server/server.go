@@ -22,7 +22,7 @@ func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config
 	clients := clients.NewClient(baseClient, log, conf)
 
 	// Инициализация ручек
-	handlers := handlers.NewHandlers(clients.UserClient, clients.NotesClient, jwtParser, validator, log)
+	handlers := handlers.NewHandlers(clients.UserClient, clients.NotesClient, clients.CategoriesClient, jwtParser, validator, log)
 
 	router := mux.NewRouter()
 
