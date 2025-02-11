@@ -12,7 +12,10 @@ class ICategoryRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> CategoryEntity:
+    async def get_category_by_id(self,
+                                 async_session: AsyncSession,
+                                 category_id: int,
+                                 user_id: int) -> CategoryEntity | None:
         pass
 
     @abstractmethod
@@ -37,20 +40,27 @@ class CategoryRepository(ICategoryRepository):
         await async_session.refresh(new_category)
         return new_category.id
 
-    async def get_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> CategoryEntity:
+    async def get_category_by_id(self,
+                                 async_session: AsyncSession,
+                                 category_id: int,
+                                 user_id: int) -> CategoryEntity | None:
+
         query = select(Category).where(and_(Category.id == category_id, Category.user_id == user_id))
         category_obj = await async_session.execute(query)
-        if category_obj is not None:
+        if category_obj is None:
+            return
 
-            category = category_obj.scalar()
+        category_scalar = category_obj.scalar()
+        if category_scalar is None:
+            return
 
-            return CategoryEntity(
-                id=category.id,
-                category_name=category.category_name,
-                user_id=category.user_id,
-                update_at=int(category.update_at.timestamp()),
-                created_at=int(category.created_at.timestamp()),
-            )
+        return CategoryEntity(
+            id=category_scalar.id,
+            category_name=category_scalar.category_name,
+            user_id=category_scalar.user_id,
+            update_at=int(category_scalar.update_at.timestamp()),
+            created_at=int(category_scalar.created_at.timestamp()),
+        )
 
     async def get_category_id_by_name(self, async_session: AsyncSession, category_name: str) -> int | None:
 
@@ -93,6 +103,7 @@ class CategoryRepository(ICategoryRepository):
         removed_category_id = await async_session.execute(query)
         if removed_category_id is None:
             return
+
         await async_session.commit()
 
         return removed_category_id.scalar()
