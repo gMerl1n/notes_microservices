@@ -8,7 +8,7 @@ from domain.domain import NoteEntity
 class INoteRepository(ABC):
 
     @abstractmethod
-    async def get_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> Note | None:
+    async def get_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> NoteEntity | None:
         raise NotImplemented
 
     @abstractmethod
@@ -30,13 +30,25 @@ class INoteRepository(ABC):
 
 class NoteRepository(INoteRepository):
 
-    async def get_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> Note | None:
+    async def get_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> NoteEntity | None:
         query = select(Note).where(and_(Note.id == note_id, Note.user_id == user_id))
         note = await async_session.execute(query)
         if note is None:
             return
 
-        return note.fetchone()
+        note_scalar = note.scalar()
+        if note_scalar is None:
+            return
+
+        return NoteEntity(
+            id=note_scalar.id,
+            category_id=note_scalar.category_id,
+            user_id=note_scalar.user_id,
+            title=note_scalar.title,
+            body=note_scalar.body,
+            update_at=int(note_scalar.update_at.timestamp()),
+            created_at=int(note_scalar.update_at.timestamp()),
+        )
 
     async def get_all_notes(self, async_session: AsyncSession, user_id: int) -> list[NoteEntity] | None:
 

@@ -41,9 +41,9 @@ class NoteService(INoteService):
 
     async def get_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> NoteEntity | None:
         note = await self.__notes_repo.get_note_by_id(async_session=async_session,
-                                                      note_id=note_id)
-        if note is not None:
-            return NoteEntity(**note)
+                                                      note_id=note_id,
+                                                      user_id=user_id)
+        return note
 
     async def get_all_notes(self, async_session: AsyncSession, user_id: int) -> list[NoteEntity] | None:
         notes = await self.__notes_repo.get_all_notes(async_session=async_session, user_id=user_id)

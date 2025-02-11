@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
 
 from services.notes_services import INoteService
-from handlers.schema_request import NoteCreateRequest, NoteGetRequest
+from handlers.schema_request import NoteCreateRequest, NoteGetRequestById
 from container.container import container
 from sqlalchemy.ext.asyncio import AsyncSession
 from settings.async_session import get_async_session
@@ -26,8 +26,8 @@ async def create_note(note: NoteCreateRequest,
     return JSONResponse(content=note_id, status_code=201)
 
 
-@router_notes.get("/get_note")
-async def get_note_by_id(note_get_request: NoteGetRequest,
+@router_notes.post("/get_note")
+async def get_note_by_id(note_get_request: NoteGetRequestById,
                          async_session: AsyncSession = Depends(get_async_session),
                          notes_service: INoteService = Depends(container.get_notes_service)) -> JSONResponse:
 
@@ -37,7 +37,7 @@ async def get_note_by_id(note_get_request: NoteGetRequest,
     if note is None:
         raise HTTPException(status_code=400, detail="Something wrong")
 
-    return JSONResponse(content=note, status_code=200)
+    return JSONResponse(content=note.to_dict(), status_code=200)
 
 
 @router_notes.get("/get_notes")
@@ -49,7 +49,7 @@ async def get_notes(user_id: int,
     if notes is None:
         raise HTTPException(status_code=400, detail="Not found")
 
-    return notes
+    return JSONResponse(content=[n.to_dict() for n in notes], status_code=200)
 
 
 @router_notes.delete("/remove_note_by_id")

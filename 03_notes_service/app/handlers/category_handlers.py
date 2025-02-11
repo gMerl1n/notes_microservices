@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from services.category_services import ICategoryService
-from handlers.schema_request import CategoryCreateRequest, CategoryGetRequest, CategoryRemoveRequest
+from handlers.schema_request import CategoryCreateRequest, CategoryGetRequestById, CategoryRemoveRequestById
 from container.container import container
 from sqlalchemy.ext.asyncio import AsyncSession
 from settings.async_session import get_async_session
@@ -25,7 +25,7 @@ async def create_category(category_create_request: CategoryCreateRequest,
 
 
 @router_categories.get("/get_category")
-async def get_category(category_get_request: CategoryGetRequest,
+async def get_category(category_get_request: CategoryGetRequestById,
                        async_session: AsyncSession = Depends(get_async_session),
                        category_service: ICategoryService = Depends(container.get_category_service)):
 
@@ -52,7 +52,7 @@ async def get_categories(user_id: int,
 
 
 @router_categories.delete("/remove_category_by_id")
-async def remove_category_by_id(category_remove_request: CategoryRemoveRequest,
+async def remove_category_by_id(category_remove_request: CategoryRemoveRequestById,
                                 async_session: AsyncSession = Depends(get_async_session),
                                 category_service: ICategoryService = Depends(container.get_category_service)):
 
