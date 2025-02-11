@@ -26,7 +26,7 @@ class INoteService(ABC):
         pass
 
     @abstractmethod
-    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int | None:
+    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> int | None:
         raise NotImplemented
 
     @abstractmethod
@@ -54,10 +54,13 @@ class NoteService(INoteService):
                         title: str,
                         body: str,
                         category_name: str,
-                        user_id: int) -> int:
+                        user_id: int) -> int | None:
 
         category_id = await self.__categories_repo.get_category_id_by_name(async_session=async_session,
                                                                            category_name=category_name)
+
+        if category_id is None:
+            return
 
         new_note = NoteEntity(
             category_id=category_id,
@@ -71,9 +74,10 @@ class NoteService(INoteService):
         id_note = await self.__notes_repo.save_note(async_session=async_session, note=new_note)
         return id_note
 
-    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int | None:
+    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> int | None:
         removed_note_id = await self.__notes_repo.remove_note_by_id(async_session=async_session,
-                                                                    note_id=note_id)
+                                                                    note_id=note_id,
+                                                                    user_id=user_id)
         return removed_note_id
 
     async def remove_all_notes(self, async_session: AsyncSession, user_id: int) -> list[int] | None:
