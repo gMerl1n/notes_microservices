@@ -1,10 +1,16 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.notes_services import INoteService
-from handlers.schema_request import NoteCreateRequest, NoteGetRequestById, NoteRemoveRequestById
+from handlers.schema_request import (
+    NoteCreateRequest,
+    NoteGetRequestById,
+    NoteRemoveRequestById,
+    NotesGetRequest,
+    NotesRemoveRequest
+)
 from container.container import container
-from sqlalchemy.ext.asyncio import AsyncSession
 from settings.async_session import get_async_session
 
 router_notes = APIRouter()
@@ -41,11 +47,11 @@ async def get_note_by_id(note_get_request: NoteGetRequestById,
 
 
 @router_notes.post("/get_notes")
-async def get_notes(user_id: int,
+async def get_notes(notes_get_request: NotesGetRequest,
                     async_session: AsyncSession = Depends(get_async_session),
                     notes_service: INoteService = Depends(container.get_notes_service)) -> JSONResponse:
 
-    notes = await notes_service.get_all_notes(async_session=async_session, user_id=user_id)
+    notes = await notes_service.get_all_notes(async_session=async_session, user_id=notes_get_request.user_id)
     if notes is None:
         raise HTTPException(status_code=400, detail="Not found")
 
@@ -67,11 +73,12 @@ async def remove_note_by_id(note_remove_by_id_request: NoteRemoveRequestById,
 
 
 @router_notes.delete("/remove_notes")
-async def remove_notes(user_id: int,
+async def remove_notes(notes_remove_request: NotesRemoveRequest,
                        async_session: AsyncSession = Depends(get_async_session),
                        notes_service: INoteService = Depends(container.get_notes_service)) -> JSONResponse:
 
-    removed_notes_ids = await notes_service.remove_all_notes(async_session=async_session, user_id=user_id)
+    removed_notes_ids = await notes_service.remove_all_notes(async_session=async_session,
+                                                             user_id=notes_remove_request.user_id)
     if removed_notes_ids is None:
         raise HTTPException(status_code=500, detail="Something went wrong")
 

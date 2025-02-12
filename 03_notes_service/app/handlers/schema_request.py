@@ -13,8 +13,16 @@ class NoteGetRequestById(BaseModel):
     user_id: int
 
 
+class NotesGetRequest(BaseModel):
+    user_id: int
+
+
 class NoteRemoveRequestById(BaseModel):
     note_id: int
+    user_id: int
+
+
+class NotesRemoveRequest(BaseModel):
     user_id: int
 
 
