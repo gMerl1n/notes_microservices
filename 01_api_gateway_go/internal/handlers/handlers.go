@@ -8,23 +8,50 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type Handlers struct {
-	HandlersUser      *HandlerUser
-	HandlersNotes     *HandlerNotes
-	HandlerCategories *HandlerCategories
+type Handler struct {
+	clientUser       clients.IClientUser
+	clientNotes      notes_server_clients.IClientNotes
+	clientCategories notes_server_clients.IClientCategories
+	jwtParser        jwt.ITokenParser
+	validator        *validator.Validate
+	logger           *logging.Logger
 }
 
-func NewHandlers(
+func NewHandler(
 	clientUser clients.IClientUser,
 	clientNotes notes_server_clients.IClientNotes,
 	clientCategories notes_server_clients.IClientCategories,
 	jwtParser jwt.ITokenParser,
 	validator *validator.Validate,
-	logger *logging.Logger) *Handlers {
+	logger *logging.Logger) *Handler {
 
-	return &Handlers{
-		HandlersUser:      NewHandlerUser(clientUser, jwtParser, validator, logger),
-		HandlersNotes:     NewHandlerNotes(clientNotes, jwtParser, validator, logger),
-		HandlerCategories: NewHandlerCategories(clientCategories, jwtParser, validator, logger),
+	return &Handler{
+		clientUser:       clientUser,
+		clientNotes:      clientNotes,
+		clientCategories: clientCategories,
+		jwtParser:        jwtParser,
+		validator:        validator,
+		logger:           logger,
 	}
 }
+
+// type Handlers struct {
+// 	HandlersUser      *HandlerUser
+// 	HandlersNotes     *HandlerNotes
+// 	HandlerCategories *HandlerCategories
+// }
+
+// func NewHandlers(
+// 	clientUser clients.IClientUser,
+// 	clientNotes notes_server_clients.IClientNotes,
+// 	clientCategories notes_server_clients.IClientCategories,
+// 	jwtParser jwt.ITokenParser,
+// 	validator *validator.Validate,
+// 	logger *logging.Logger) *Handlers {
+
+// 	return &Handlers{
+// 		HandlersUser:      NewHandlerUser(clientUser, jwtParser, validator, logger),
+// 		HandlersNotes:     NewHandlerNotes(clientNotes, jwtParser, validator, logger),
+// 		HandlerCategories: NewHandlerCategories(clientCategories, jwtParser, validator, logger),
+// 	}
+// }

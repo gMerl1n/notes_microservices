@@ -4,37 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gMerl1n/notes_microservices/internal/clients/notes_server_clients"
 	"github.com/gMerl1n/notes_microservices/internal/models"
 	"github.com/gMerl1n/notes_microservices/pkg/apperrors"
-	"github.com/gMerl1n/notes_microservices/pkg/jwt"
-	"github.com/gMerl1n/notes_microservices/pkg/logging"
-	"github.com/go-playground/validator/v10"
 )
 
-type HandlerNotes struct {
-	clientNotes notes_server_clients.IClientNotes
-	jwtParser   jwt.ITokenParser
-	validator   *validator.Validate
-	logger      *logging.Logger
-}
-
-func NewHandlerNotes(
-	clientNotes notes_server_clients.IClientNotes,
-	jwtParser jwt.ITokenParser,
-	validator *validator.Validate,
-	log *logging.Logger,
-
-) *HandlerNotes {
-	return &HandlerNotes{
-		clientNotes: clientNotes,
-		jwtParser:   jwtParser,
-		validator:   validator,
-		logger:      log,
-	}
-}
-
-func (h *HandlerNotes) CreateNote(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -55,11 +29,19 @@ func (h *HandlerNotes) CreateNote(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *HandlerNotes) GetNoteByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetNoteByID(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
+	userId, ok := r.Context().Value(UserContextKey).(int)
+	if !ok {
+		h.logger.Error("Failed to parse userID from token")
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to parse userID from token")
+	}
+
 	var noteGetByID models.NoteGetRequestByID
+
+	noteGetByID.UserID = userId
 
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&noteGetByID); err != nil {
@@ -76,7 +58,7 @@ func (h *HandlerNotes) GetNoteByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *HandlerNotes) GetNotes(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetNotes(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -97,7 +79,7 @@ func (h *HandlerNotes) GetNotes(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *HandlerNotes) RemoveNoteByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) RemoveNoteByID(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -118,7 +100,7 @@ func (h *HandlerNotes) RemoveNoteByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *HandlerNotes) RemoveNotes(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) RemoveNotes(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
