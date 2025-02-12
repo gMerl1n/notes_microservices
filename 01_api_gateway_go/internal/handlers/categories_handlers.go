@@ -80,15 +80,15 @@ func (h *HandlerCategories) GetCategories(w http.ResponseWriter, r *http.Request
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var userID int
+	var categoriesGetRequest models.CategoriesGetRequest
 
 	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&userID); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&categoriesGetRequest); err != nil {
 		h.logger.Error("Failed to unmarshal note get by id data %w", err)
 		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to decode login user data")
 	}
 
-	categories, err := h.clientCategories.GetCategories(r.Context(), userID)
+	categories, err := h.clientCategories.GetCategories(r.Context(), &categoriesGetRequest)
 	if err != nil {
 	}
 
