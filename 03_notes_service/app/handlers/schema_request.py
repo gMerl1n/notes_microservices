@@ -36,6 +36,10 @@ class CategoryGetRequestById(BaseModel):
     user_id: int
 
 
+class CategoriesGetRequest(BaseModel):
+    user_id: int
+
+
 class CategoryRemoveRequestById(BaseModel):
     category_id: int
     user_id: int

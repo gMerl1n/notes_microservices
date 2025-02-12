@@ -1,10 +1,16 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
-from services.category_services import ICategoryService
-from handlers.schema_request import CategoryCreateRequest, CategoryGetRequestById, CategoryRemoveRequestById
-from container.container import container
 from sqlalchemy.ext.asyncio import AsyncSession
+from services.category_services import ICategoryService
+from container.container import container
 from settings.async_session import get_async_session
+from handlers.schema_request import (
+    CategoryCreateRequest,
+    CategoryGetRequestById,
+    CategoryRemoveRequestById,
+    CategoriesGetRequest
+)
+
 
 router_categories = APIRouter()
 
@@ -40,11 +46,12 @@ async def get_category(category_get_request: CategoryGetRequestById,
 
 
 @router_categories.post("/get_all_categories")
-async def get_categories(user_id: int,
+async def get_categories(categories_get_request: CategoriesGetRequest,
                          async_session: AsyncSession = Depends(get_async_session),
                          category_service: ICategoryService = Depends(container.get_category_service)) -> JSONResponse:
 
-    categories = await category_service.get_categories(async_session=async_session, user_id=user_id)
+    categories = await category_service.get_categories(async_session=async_session,
+                                                       user_id=categories_get_request.user_id)
     if categories is None:
         raise HTTPException(status_code=400, detail="Not found")
 
