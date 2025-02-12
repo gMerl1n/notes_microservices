@@ -17,9 +17,9 @@ import (
 type IClientNotes interface {
 	CreateNote(ctx context.Context, userCreate *models.NoteCreateRequest) ([]byte, error)
 	GetNoteByID(ctx context.Context, noteGetRequest *models.NoteGetRequestByID) ([]byte, error)
-	GetNotes(ctx context.Context, userID int) ([]byte, error)
+	GetNotes(ctx context.Context, notesGet *models.NotesGetRequest) ([]byte, error)
 	RemoveNoteByID(ctx context.Context, noteRemoveRequest *models.NoteRemoveRequestByID) ([]byte, error)
-	RemoveNotes(ctx context.Context, userID int) ([]byte, error)
+	RemoveNotes(ctx context.Context, notesRemove *models.NotesRemove) ([]byte, error)
 }
 
 type ClientNotes struct {
@@ -40,7 +40,7 @@ func (c *ClientNotes) CreateNote(ctx context.Context, userCreate *models.NoteCre
 
 	dataByes, err := json.Marshal(userCreate)
 	if err != nil {
-		c.logger.Warn("Failed to marshal new note data %w", err)
+		c.logger.Warn("failed to marshal new note data %w", err)
 		return nil, err
 	}
 
@@ -66,7 +66,7 @@ func (c *ClientNotes) CreateNote(ctx context.Context, userCreate *models.NoteCre
 
 		return responseBytes, nil
 	} else {
-		c.logger.Warn("Bad request", response.StatusCode())
+		c.logger.Warn("bad request", response.StatusCode())
 		return nil, fmt.Errorf("bad request %d", response.StatusCode())
 	}
 
@@ -76,13 +76,13 @@ func (c *ClientNotes) GetNoteByID(ctx context.Context, noteGetRequest *models.No
 
 	dataByes, err := json.Marshal(noteGetRequest)
 	if err != nil {
-		c.logger.Warn("Failed to marshal new user data %w", err)
+		c.logger.Warn("failed to marshal new get note data %w", err)
 		return nil, err
 	}
 
 	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlGetNoteByID, bytes.NewBuffer(dataByes))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create new request due to error: %w", err)
+		return nil, fmt.Errorf("failed to create new request get note by id due to error: %w", err)
 	}
 
 	reqCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -91,7 +91,7 @@ func (c *ClientNotes) GetNoteByID(ctx context.Context, noteGetRequest *models.No
 
 	response, err := c.baseClient.SendRequest(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request due to error: %w", err)
+		return nil, fmt.Errorf("failed to send request get note by due to error: %w", err)
 	}
 
 	if response.IsOk {
@@ -102,23 +102,23 @@ func (c *ClientNotes) GetNoteByID(ctx context.Context, noteGetRequest *models.No
 
 		return responseBytes, nil
 	} else {
-		c.logger.Warn("Bad request", response.StatusCode())
+		c.logger.Warn("bad request", response.StatusCode())
 		return nil, fmt.Errorf("bad request %d", response.StatusCode())
 	}
 
 }
 
-func (c *ClientNotes) GetNotes(ctx context.Context, userID int) ([]byte, error) {
+func (c *ClientNotes) GetNotes(ctx context.Context, notesGet *models.NotesGetRequest) ([]byte, error) {
 
-	dataByes, err := json.Marshal(userID)
+	dataByes, err := json.Marshal(notesGet)
 	if err != nil {
-		c.logger.Warn("Failed to marshal new user data %w", err)
+		c.logger.Warn("failed to marshal new get notes data %w", err)
 		return nil, err
 	}
 
 	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlGetNotes, bytes.NewBuffer(dataByes))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create new request due to error: %w", err)
+		return nil, fmt.Errorf("failed to create new request get nots due to error: %w", err)
 	}
 
 	reqCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -138,7 +138,7 @@ func (c *ClientNotes) GetNotes(ctx context.Context, userID int) ([]byte, error) 
 
 		return responseBytes, nil
 	} else {
-		c.logger.Warn("Bad request", response.StatusCode())
+		c.logger.Warn("bad request", response.StatusCode())
 		return nil, fmt.Errorf("bad request %d", response.StatusCode())
 	}
 
@@ -148,13 +148,13 @@ func (c *ClientNotes) RemoveNoteByID(ctx context.Context, noteRemoveRequest *mod
 
 	dataByes, err := json.Marshal(noteRemoveRequest)
 	if err != nil {
-		c.logger.Warn("Failed to marshal new user data %w", err)
+		c.logger.Warn("failed to marshal new user data %w", err)
 		return nil, err
 	}
 
 	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlRemoveNoteByID, bytes.NewBuffer(dataByes))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create new request due to error: %w", err)
+		return nil, fmt.Errorf("failed to create new request remove note by id due to error: %w", err)
 	}
 
 	reqCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -163,7 +163,7 @@ func (c *ClientNotes) RemoveNoteByID(ctx context.Context, noteRemoveRequest *mod
 
 	response, err := c.baseClient.SendRequest(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request due to error: %w", err)
+		return nil, fmt.Errorf("failed to send request due remove note by id to error: %w", err)
 	}
 
 	if response.IsOk {
@@ -174,23 +174,23 @@ func (c *ClientNotes) RemoveNoteByID(ctx context.Context, noteRemoveRequest *mod
 
 		return responseBytes, nil
 	} else {
-		c.logger.Warn("Bad request", response.StatusCode())
+		c.logger.Warn("bad request", response.StatusCode())
 		return nil, fmt.Errorf("bad request %d", response.StatusCode())
 	}
 
 }
 
-func (c *ClientNotes) RemoveNotes(ctx context.Context, userID int) ([]byte, error) {
+func (c *ClientNotes) RemoveNotes(ctx context.Context, notesRemove *models.NotesRemove) ([]byte, error) {
 
-	dataByes, err := json.Marshal(userID)
+	dataByes, err := json.Marshal(notesRemove)
 	if err != nil {
-		c.logger.Warn("Failed to marshal new user data %w", err)
+		c.logger.Warn("Failed to marshal new remove notes data %w", err)
 		return nil, err
 	}
 
 	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlRemoveNoteByID, bytes.NewBuffer(dataByes))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create new request due to error: %w", err)
+		return nil, fmt.Errorf("failed to create new request remove notes due to error: %w", err)
 	}
 
 	reqCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -199,7 +199,7 @@ func (c *ClientNotes) RemoveNotes(ctx context.Context, userID int) ([]byte, erro
 
 	response, err := c.baseClient.SendRequest(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request due to error: %w", err)
+		return nil, fmt.Errorf("failed to send request remove notes due to error: %w", err)
 	}
 
 	if response.IsOk {
@@ -210,7 +210,7 @@ func (c *ClientNotes) RemoveNotes(ctx context.Context, userID int) ([]byte, erro
 
 		return responseBytes, nil
 	} else {
-		c.logger.Warn("Bad request", response.StatusCode())
+		c.logger.Warn("bad request", response.StatusCode())
 		return nil, fmt.Errorf("bad request %d", response.StatusCode())
 	}
 

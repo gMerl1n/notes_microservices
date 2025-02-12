@@ -12,7 +12,15 @@ type NoteGetRequestByID struct {
 	UserID int `json:"user_id" validate:"required"`
 }
 
+type NotesGetRequest struct {
+	UserID int `json:"user_id" validate:"required"`
+}
+
 type NoteRemoveRequestByID struct {
 	NoteID int `json:"note_id" validate:"required"`
+	UserID int `json:"user_id" validate:"required"`
+}
+
+type NotesRemove struct {
 	UserID int `json:"user_id" validate:"required"`
 }

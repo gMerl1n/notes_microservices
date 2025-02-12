@@ -80,15 +80,15 @@ func (h *HandlerNotes) GetNotes(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var userID int
+	var notesGet models.NotesGetRequest
 
 	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&userID); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&notesGet); err != nil {
 		h.logger.Error("Failed to unmarshal user ID  data to get notes %w", err)
 		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to decode login user data")
 	}
 
-	notes, err := h.clientNotes.GetNotes(r.Context(), userID)
+	notes, err := h.clientNotes.GetNotes(r.Context(), &notesGet)
 	if err != nil {
 	}
 
@@ -122,15 +122,15 @@ func (h *HandlerNotes) RemoveNotes(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var userID int
+	var notesRemove models.NotesRemove
 
 	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&userID); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&notesRemove); err != nil {
 		h.logger.Error("Failed to unmarshal user ID  data to remove notes %w", err)
 		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to decode login user data")
 	}
 
-	notes, err := h.clientNotes.RemoveNotes(r.Context(), userID)
+	notes, err := h.clientNotes.RemoveNotes(r.Context(), &notesRemove)
 	if err != nil {
 	}
 

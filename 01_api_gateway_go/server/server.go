@@ -33,15 +33,15 @@ func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config
 
 	// notices handlers
 	router.HandleFunc("/api_gateway/v1/create_note", handlers.HandlersNotes.CreateNote).Methods("POST")
-	router.HandleFunc("/api_gateway/v1/get_note_by_id", handlers.HandlersNotes.GetNoteByID).Methods("GET")
-	router.HandleFunc("/api_gateway/v1/get_notes", handlers.HandlersNotes.GetNotes).Methods("GET")
+	router.HandleFunc("/api_gateway/v1/get_note_by_id", handlers.HandlersNotes.GetNoteByID).Methods("POST")
+	router.HandleFunc("/api_gateway/v1/get_notes", handlers.HandlersNotes.GetNotes).Methods("POST")
 	router.HandleFunc("/api_gateway/v1/delete_note_by_id", handlers.HandlersNotes.RemoveNoteByID).Methods("DELETE")
 	router.HandleFunc("/api_gateway/v1/delete_notes", handlers.HandlersNotes.RemoveNotes).Methods("DELETE")
 
 	// categories handlers
 	router.HandleFunc("/api_gateway/v1/create_category", handlers.HandlerCategories.CreateCategory).Methods("POST")
-	router.HandleFunc("/api_gateway/v1/get_category_by_id", handlers.HandlerCategories.GetCategoryByID).Methods("GET")
-	router.HandleFunc("/api_gateway/v1/get_categories", handlers.HandlerCategories.GetCategories).Methods("GET")
+	router.HandleFunc("/api_gateway/v1/get_category_by_id", handlers.HandlerCategories.GetCategoryByID).Methods("POST")
+	router.HandleFunc("/api_gateway/v1/get_categories", handlers.HandlerCategories.GetCategories).Methods("POST")
 	router.HandleFunc("/api_gateway/v1/remove_category_by_id", handlers.HandlerCategories.RemoveCategoryByID).Methods("DELETE")
 
 	return &http.Server{
