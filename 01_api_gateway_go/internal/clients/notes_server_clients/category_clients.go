@@ -43,7 +43,7 @@ func (c *ClientCategories) CreateCategory(ctx context.Context, categoryCreate *m
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlGetNoteByID, bytes.NewBuffer(dataByes))
+	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlCreateCategory, bytes.NewBuffer(dataByes))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new request get note by id due to error: %w", err)
 	}
@@ -71,15 +71,15 @@ func (c *ClientCategories) CreateCategory(ctx context.Context, categoryCreate *m
 
 }
 
-func (c *ClientCategories) GetCategoryByID(ctx context.Context, categoryGetRequest *models.CategoryGetRequestByID) ([]byte, error) {
+func (c *ClientCategories) GetCategoryByID(ctx context.Context, categoryGetRequestByID *models.CategoryGetRequestByID) ([]byte, error) {
 
-	dataByes, err := json.Marshal(categoryGetRequest)
+	dataByes, err := json.Marshal(categoryGetRequestByID)
 	if err != nil {
 		c.logger.Warn("failed to marshal new get note data %w", err)
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlGetNoteByID, bytes.NewBuffer(dataByes))
+	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlGetCategoryByID, bytes.NewBuffer(dataByes))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new request get note by id due to error: %w", err)
 	}
@@ -115,7 +115,7 @@ func (c *ClientCategories) GetCategories(ctx context.Context, categoriesGetReque
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlGetNotes, bytes.NewBuffer(dataByes))
+	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlGetCategories, bytes.NewBuffer(dataByes))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new request get nots due to error: %w", err)
 	}
@@ -151,7 +151,7 @@ func (c *ClientCategories) RemoveCategoryByID(ctx context.Context, categoryRemov
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlRemoveNoteByID, bytes.NewBuffer(dataByes))
+	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlRemoveCategoryByID, bytes.NewBuffer(dataByes))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new request remove notes due to error: %w", err)
 	}

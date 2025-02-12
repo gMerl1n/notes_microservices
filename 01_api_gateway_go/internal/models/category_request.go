@@ -1,8 +1,8 @@
 package models
 
 type CategoryCreateRequest struct {
-	UserID       int    `json:"user_id" validate:"required"`
 	CategoryName string `json:"category_name" validate:"required"`
+	UserID       int    `json:"user_id" validate:"required"`
 }
 
 type CategoryGetRequestByID struct {
@@ -11,8 +11,7 @@ type CategoryGetRequestByID struct {
 }
 
 type CategoriesGetRequest struct {
-	UserID     int `json:"user_id" validate:"required"`
-	CategoryID int `json:"category_id" validate:"required"`
+	UserID int `json:"user_id" validate:"required"`
 }
 
 type CategoryRemoveRequestByID struct {
