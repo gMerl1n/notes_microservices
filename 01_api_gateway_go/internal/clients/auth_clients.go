@@ -28,10 +28,7 @@ type ClientUser struct {
 	logger     *logging.Logger
 }
 
-func NewClientUser(
-	baseClient *client.BaseClient,
-	log *logging.Logger,
-	configAuthServer *config.ConfigAuthServer) *ClientUser {
+func NewClientUser(baseClient *client.BaseClient, log *logging.Logger, configAuthServer *config.ConfigAuthServer) *ClientUser {
 
 	return &ClientUser{
 		baseClient: baseClient,

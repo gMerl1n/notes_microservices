@@ -1,8 +1,15 @@
+import logging
 from abc import ABC, abstractmethod
-from sqlalchemy import select, and_, update, delete
+from sqlalchemy import select, and_, delete
 from repository.models import Category
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.domain import CategoryEntity
+
+logging.basicConfig(
+    format='%(asctime)s - %(message)s',
+    datefmt='%d-%b-%y %H:%M:%S',
+    level=logging.INFO
+)
 
 
 class ICategoryRepository(ABC):
@@ -12,7 +19,10 @@ class ICategoryRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_category_by_id(self, async_session: AsyncSession, category_id: int) -> CategoryEntity:
+    async def get_category_by_id(self,
+                                 async_session: AsyncSession,
+                                 category_id: int,
+                                 user_id: int) -> CategoryEntity | None:
         pass
 
     @abstractmethod
@@ -24,7 +34,7 @@ class ICategoryRepository(ABC):
         pass
 
     @abstractmethod
-    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int | None:
+    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> int | None:
         pass
 
 class CategoryRepository(ICategoryRepository):
@@ -37,30 +47,42 @@ class CategoryRepository(ICategoryRepository):
         await async_session.refresh(new_category)
         return new_category.id
 
-    async def get_category_by_id(self, async_session: AsyncSession, category_id: int) -> CategoryEntity:
-        query = select(Category).where(Category.id == category_id)
+    async def get_category_by_id(self,
+                                 async_session: AsyncSession,
+                                 category_id: int,
+                                 user_id: int) -> CategoryEntity | None:
+
+        query = select(Category).where(and_(Category.id == category_id, Category.user_id == user_id))
         category_obj = await async_session.execute(query)
-        if category_obj is not None:
+        if category_obj is None:
+            logging.warning(f"Category with user id {user_id} or category id {category_id} do not exist")
+            return
 
-            category = category_obj.scalar()
+        category_scalar = category_obj.scalar()
+        if category_scalar is None:
+            logging.warning(f"Failed to get scalar data from query category. "
+                            f"Probably, category with user id {user_id} or category id {category_id} do not exist")
+            return
 
-            return CategoryEntity(
-                id=category.id,
-                category_name=category.category_name,
-                user_id=category.user_id,
-                update_at=int(category.update_at.timestamp()),
-                created_at=int(category.created_at.timestamp()),
-            )
+        return CategoryEntity(
+            id=category_scalar.id,
+            category_name=category_scalar.category_name,
+            user_id=category_scalar.user_id,
+            update_at=int(category_scalar.update_at.timestamp()),
+            created_at=int(category_scalar.created_at.timestamp()),
+        )
 
     async def get_category_id_by_name(self, async_session: AsyncSession, category_name: str) -> int | None:
 
         query = select(Category).where(Category.category_name == category_name)
         category = await async_session.execute(query)
         if category is None:
+            logging.warning(f"Category with name {category_name} do not exist")
             return
 
         category_scalar = category.scalar()
         if category_scalar is None:
+            logging.warning(f"Failed to get scalar data from query get category by name {category_name}")
             return
 
         return category_scalar.id
@@ -72,6 +94,7 @@ class CategoryRepository(ICategoryRepository):
         query = select(Category).where(Category.user_id == user_id)
         categories = await async_session.execute(query)
         if categories is None:
+            logging.warning(f"Categories with user id {user_id} do not exist")
             return
 
         for category in categories.scalars():
@@ -87,12 +110,14 @@ class CategoryRepository(ICategoryRepository):
 
         return result
 
-    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int) -> int | None:
+    async def remove_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> int | None:
 
-        query = delete(Category).where(Category.id == category_id).returning(Category.id)
+        query = delete(Category).where(and_(Category.id == category_id, Category.user_id == user_id)).returning(Category.id)
         removed_category_id = await async_session.execute(query)
         if removed_category_id is None:
+            logging.warning(f"Category with user id {user_id} do not exist. Impossible to remove")
             return
+
         await async_session.commit()
 
         return removed_category_id.scalar()

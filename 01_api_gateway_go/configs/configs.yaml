@@ -7,6 +7,18 @@ token:
   jwt_secret: $3cr3t
 
 auth_server:
-  create_user_url: "http://localhost:10001/api/v1/create_user"
-  login_user_url: "http://localhost:10001/api/v1/login_user"
-  refresh_token_url: "http://localhost:10001/api/v1/refresh_token"
+  create_user_url: "http://localhost:10002/api/v1/create_user"
+  login_user_url: "http://localhost:10002/api/v1/login_user"
+  refresh_token_url: "http://localhost:10002/api/v1/refresh_token/"
+
+notes_server:
+  create_note_url: "http://localhost:10003/notes/create_note"
+  get_note_by_id: "http://localhost:10003/notes/get_note"
+  get_notes: "http://localhost:10003/notes/get_notes"
+  remove_note_by_id: "http://localhost:10003/notes/remove_note_by_id"
+  remove_notes: "http://localhost:10003/notes/remove_notes"
+
+  create_category: "http://localhost:10003/categories/create_category"
+  get_category_by_id: "http://localhost:10003/categories/get_category"
+  get_categories: "http://localhost:10003/categories/get_all_categories"
+  remove_category_by_id: "http://localhost:10003/categories/remove_category_by_id"

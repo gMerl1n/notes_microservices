@@ -5,37 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gMerl1n/notes_microservices/internal/clients"
 	"github.com/gMerl1n/notes_microservices/internal/models"
 	"github.com/gMerl1n/notes_microservices/pkg/apperrors"
-	"github.com/gMerl1n/notes_microservices/pkg/jwt"
-	"github.com/gMerl1n/notes_microservices/pkg/logging"
-	"github.com/go-playground/validator/v10"
 )
 
-type HandlerUser struct {
-	clientUser clients.IClientUser
-	jwtParser  jwt.ITokenParser
-	validator  *validator.Validate
-	logger     *logging.Logger
-}
-
-func NewHandlerUser(
-	clientUser clients.IClientUser,
-	jwtParser jwt.ITokenParser,
-	validator *validator.Validate,
-	logger *logging.Logger) *HandlerUser {
-
-	return &HandlerUser{
-		clientUser: clientUser,
-		jwtParser:  jwtParser,
-		validator:  validator,
-		logger:     logger,
-	}
-
-}
-
-func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	h.logger.Info("creating user...")
 
@@ -59,17 +33,11 @@ func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to create a new user in DB")
 	}
 
-	resp, err := json.Marshal(userID)
-	if err != nil {
-		h.logger.Error("Failed to marshal userID %w", err)
-		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to marshal returned user ID")
-	}
-
 	w.WriteHeader(http.StatusCreated)
-	w.Write(resp)
+	w.Write(userID)
 }
 
-func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -90,7 +58,7 @@ func (h *HandlerUser) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *HandlerUser) RefreshTokens(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 

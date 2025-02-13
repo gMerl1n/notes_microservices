@@ -35,5 +35,6 @@ func sendErrorResponse(w http.ResponseWriter, message *AppError) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(message.Code)
 	w.Write(responseJSON)
 }

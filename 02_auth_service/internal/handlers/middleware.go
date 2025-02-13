@@ -11,13 +11,13 @@ type userCtx string
 const (
 	// for AuthMiddleware
 	AuthorizationHeader string  = "Authorization"
-	UserContextKey      userCtx = "UserUUID"
+	UserContextKey      userCtx = "UserID"
 )
 
-func (h *HandlerUser) AuthMiddleware(hf http.HandlerFunc) http.HandlerFunc {
-	return func(response http.ResponseWriter, request *http.Request) {
+func (h *HandlerUser) AuthMiddleware(handlerFunc http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-		header := request.Header.Get(AuthorizationHeader)
+		header := r.Header.Get(AuthorizationHeader)
 
 		headerParts := strings.Split(header, " ")
 
@@ -31,16 +31,16 @@ func (h *HandlerUser) AuthMiddleware(hf http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		userUUID, err := h.tokenManager.Parse(headerParts[1])
+		userID, err := h.tokenManager.Parse(headerParts[1])
 		if err != nil {
 			h.logger.Warn("ParseToken", err.Error())
 			return
 		}
 
-		ctx := context.WithValue(request.Context(), UserContextKey, userUUID)
-		request = request.WithContext(ctx)
+		ctx := context.WithValue(r.Context(), UserContextKey, userID)
+		r = r.WithContext(ctx)
 
-		hf(response, request)
+		handlerFunc(w, r)
 
 	}
 }

@@ -1,14 +1,21 @@
+import logging
 from abc import ABC, abstractmethod
 from sqlalchemy import select, and_, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from repository.models import Note
 from domain.domain import NoteEntity
 
+logging.basicConfig(
+    format='%(asctime)s - %(message)s',
+    datefmt='%d-%b-%y %H:%M:%S',
+    level=logging.INFO
+)
+
 
 class INoteRepository(ABC):
 
     @abstractmethod
-    async def get_note_by_id(self, async_session: AsyncSession, note_id: int) -> Note | None:
+    async def get_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> NoteEntity | None:
         raise NotImplemented
 
     @abstractmethod
@@ -20,7 +27,7 @@ class INoteRepository(ABC):
         raise NotImplemented
 
     @abstractmethod
-    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int | None:
+    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> int | None:
         raise NotImplemented
 
     @abstractmethod
@@ -30,13 +37,28 @@ class INoteRepository(ABC):
 
 class NoteRepository(INoteRepository):
 
-    async def get_note_by_id(self, async_session: AsyncSession, note_id: int) -> Note | None:
-        query = select(Note).where(Note.id == note_id)
+    async def get_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> NoteEntity | None:
+        query = select(Note).where(and_(Note.id == note_id, Note.user_id == user_id))
         note = await async_session.execute(query)
         if note is None:
+            logging.warning(f"Note with user id {user_id} or note id {note_id} do not exist")
             return
 
-        return note.fetchone()
+        note_scalar = note.scalar()
+        if note_scalar is None:
+            logging.warning(f"Failed to get scalar data from query note. "
+                            f"Probably, note with user id {user_id} or note id {note_id} do not exist")
+            return
+
+        return NoteEntity(
+            id=note_scalar.id,
+            category_id=note_scalar.category_id,
+            user_id=note_scalar.user_id,
+            title=note_scalar.title,
+            body=note_scalar.body,
+            update_at=int(note_scalar.update_at.timestamp()),
+            created_at=int(note_scalar.update_at.timestamp()),
+        )
 
     async def get_all_notes(self, async_session: AsyncSession, user_id: int) -> list[NoteEntity] | None:
 
@@ -46,6 +68,7 @@ class NoteRepository(INoteRepository):
         notes = await async_session.execute(query)
 
         if notes is None:
+            logging.warning(f"Notes with user id {user_id} do not exist")
             return
 
         for note in notes.scalars():
@@ -70,10 +93,11 @@ class NoteRepository(INoteRepository):
         await async_session.refresh(new_note)
         return new_note.id
 
-    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int) -> int | None:
-        query = delete(Note).where(Note.id == note_id).returning(Note.id)
+    async def remove_note_by_id(self, async_session: AsyncSession, note_id: int, user_id: int) -> int | None:
+        query = delete(Note).where(and_(Note.id == note_id, Note.user_id == user_id)).returning(Note.id)
         removed_note_id = await async_session.execute(query)
         if removed_note_id is None:
+            logging.warning(f"Note with user id {user_id} or note id {note_id} do not exist. Impossible to remove")
             return
 
         await async_session.commit()
@@ -85,6 +109,7 @@ class NoteRepository(INoteRepository):
         query = delete(Note).where(Note.user_id == user_id).returning(Note.id)
         removed_note_ids = await async_session.execute(query)
         if removed_note_ids is None:
+            logging.warning(f"Notes with user id {user_id} do not exist. Impossible to remove")
             return
 
         await async_session.commit()

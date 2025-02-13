@@ -2,22 +2,35 @@ package handlers
 
 import (
 	"github.com/gMerl1n/notes_microservices/internal/clients"
+	"github.com/gMerl1n/notes_microservices/internal/clients/notes_server_clients"
 	"github.com/gMerl1n/notes_microservices/pkg/jwt"
 	"github.com/gMerl1n/notes_microservices/pkg/logging"
 	"github.com/go-playground/validator/v10"
 )
 
-type Handlers struct {
-	HandlersUser *HandlerUser
+type Handler struct {
+	clientUser       clients.IClientUser
+	clientNotes      notes_server_clients.IClientNotes
+	clientCategories notes_server_clients.IClientCategories
+	jwtParser        jwt.ITokenParser
+	validator        *validator.Validate
+	logger           *logging.Logger
 }
 
-func NewHandlers(
+func NewHandler(
 	clientUser clients.IClientUser,
+	clientNotes notes_server_clients.IClientNotes,
+	clientCategories notes_server_clients.IClientCategories,
 	jwtParser jwt.ITokenParser,
 	validator *validator.Validate,
-	logger *logging.Logger) *Handlers {
+	logger *logging.Logger) *Handler {
 
-	return &Handlers{
-		HandlersUser: NewHandlerUser(clientUser, jwtParser, validator, logger),
+	return &Handler{
+		clientUser:       clientUser,
+		clientNotes:      clientNotes,
+		clientCategories: clientCategories,
+		jwtParser:        jwtParser,
+		validator:        validator,
+		logger:           logger,
 	}
 }
