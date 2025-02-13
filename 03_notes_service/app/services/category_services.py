@@ -1,9 +1,16 @@
+import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from repository.category_repository import ICategoryRepository
 from repository.notes_repository import INoteRepository
 from domain.domain import CategoryEntity
+
+logging.basicConfig(
+    format='%(asctime)s - %(message)s',
+    datefmt='%d-%b-%y %H:%M:%S',
+    level=logging.INFO
+)
 
 
 class ICategoryService(ABC):
@@ -24,6 +31,7 @@ class ICategoryService(ABC):
     async def remove_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> dict | None:
         pass
 
+
 class CategoryService(ICategoryService):
 
     def __init__(self, category_repo: ICategoryRepository, notes_repo: INoteRepository) -> None:
@@ -31,7 +39,6 @@ class CategoryService(ICategoryService):
         self.__notes_repo = notes_repo
 
     async def create_category(self, async_session: AsyncSession, category_name: str, user_id: int) -> int:
-
         new_category = CategoryEntity(
             category_name=category_name,
             user_id=user_id,
@@ -43,7 +50,6 @@ class CategoryService(ICategoryService):
         return category_id
 
     async def get_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> CategoryEntity:
-
         category = await self.__category_repo.get_category_by_id(async_session=async_session,
                                                                  category_id=category_id,
                                                                  user_id=user_id)
@@ -54,14 +60,15 @@ class CategoryService(ICategoryService):
         return categories
 
     async def remove_category_by_id(self, async_session: AsyncSession, category_id: int, user_id: int) -> dict | None:
-
-
         removed_notes_ids = await self.__notes_repo.remove_all_notes(async_session=async_session, user_id=user_id)
 
         removed_category_id = await self.__category_repo.remove_category_by_id(async_session=async_session,
                                                                                category_id=category_id,
                                                                                user_id=user_id)
         if removed_category_id is None:
+            logging.warning(f"User ID: {user_id} "
+                            f"Category with such id does not exist: {category_id}. "
+                            f"Impossible to remove the category")
             return
 
         return {"removed_notes_ids": removed_notes_ids, "removed_category_id": removed_category_id}

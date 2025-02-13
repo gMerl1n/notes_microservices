@@ -1,8 +1,15 @@
+import logging
 from abc import ABC, abstractmethod
-from sqlalchemy import select, and_, update, delete
+from sqlalchemy import select, and_, delete
 from repository.models import Category
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.domain import CategoryEntity
+
+logging.basicConfig(
+    format='%(asctime)s - %(message)s',
+    datefmt='%d-%b-%y %H:%M:%S',
+    level=logging.INFO
+)
 
 
 class ICategoryRepository(ABC):
@@ -48,10 +55,13 @@ class CategoryRepository(ICategoryRepository):
         query = select(Category).where(and_(Category.id == category_id, Category.user_id == user_id))
         category_obj = await async_session.execute(query)
         if category_obj is None:
+            logging.warning(f"Category with user id {user_id} or category id {category_id} do not exist")
             return
 
         category_scalar = category_obj.scalar()
         if category_scalar is None:
+            logging.warning(f"Failed to get scalar data from query category. "
+                            f"Probably, category with user id {user_id} or category id {category_id} do not exist")
             return
 
         return CategoryEntity(
@@ -67,10 +77,12 @@ class CategoryRepository(ICategoryRepository):
         query = select(Category).where(Category.category_name == category_name)
         category = await async_session.execute(query)
         if category is None:
+            logging.warning(f"Category with name {category_name} do not exist")
             return
 
         category_scalar = category.scalar()
         if category_scalar is None:
+            logging.warning(f"Failed to get scalar data from query get category by name {category_name}")
             return
 
         return category_scalar.id
@@ -82,6 +94,7 @@ class CategoryRepository(ICategoryRepository):
         query = select(Category).where(Category.user_id == user_id)
         categories = await async_session.execute(query)
         if categories is None:
+            logging.warning(f"Categories with user id {user_id} do not exist")
             return
 
         for category in categories.scalars():
@@ -102,6 +115,7 @@ class CategoryRepository(ICategoryRepository):
         query = delete(Category).where(and_(Category.id == category_id, Category.user_id == user_id)).returning(Category.id)
         removed_category_id = await async_session.execute(query)
         if removed_category_id is None:
+            logging.warning(f"Category with user id {user_id} do not exist. Impossible to remove")
             return
 
         await async_session.commit()

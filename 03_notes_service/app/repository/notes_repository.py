@@ -1,8 +1,15 @@
+import logging
 from abc import ABC, abstractmethod
 from sqlalchemy import select, and_, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from repository.models import Note
 from domain.domain import NoteEntity
+
+logging.basicConfig(
+    format='%(asctime)s - %(message)s',
+    datefmt='%d-%b-%y %H:%M:%S',
+    level=logging.INFO
+)
 
 
 class INoteRepository(ABC):
@@ -34,10 +41,13 @@ class NoteRepository(INoteRepository):
         query = select(Note).where(and_(Note.id == note_id, Note.user_id == user_id))
         note = await async_session.execute(query)
         if note is None:
+            logging.warning(f"Note with user id {user_id} or note id {note_id} do not exist")
             return
 
         note_scalar = note.scalar()
         if note_scalar is None:
+            logging.warning(f"Failed to get scalar data from query note. "
+                            f"Probably, note with user id {user_id} or note id {note_id} do not exist")
             return
 
         return NoteEntity(
@@ -58,6 +68,7 @@ class NoteRepository(INoteRepository):
         notes = await async_session.execute(query)
 
         if notes is None:
+            logging.warning(f"Notes with user id {user_id} do not exist")
             return
 
         for note in notes.scalars():
@@ -86,6 +97,7 @@ class NoteRepository(INoteRepository):
         query = delete(Note).where(and_(Note.id == note_id, Note.user_id == user_id)).returning(Note.id)
         removed_note_id = await async_session.execute(query)
         if removed_note_id is None:
+            logging.warning(f"Note with user id {user_id} or note id {note_id} do not exist. Impossible to remove")
             return
 
         await async_session.commit()
@@ -97,6 +109,7 @@ class NoteRepository(INoteRepository):
         query = delete(Note).where(Note.user_id == user_id).returning(Note.id)
         removed_note_ids = await async_session.execute(query)
         if removed_note_ids is None:
+            logging.warning(f"Notes with user id {user_id} do not exist. Impossible to remove")
             return
 
         await async_session.commit()
