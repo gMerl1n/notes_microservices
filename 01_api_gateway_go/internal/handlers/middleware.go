@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -16,11 +17,11 @@ const (
 )
 
 func (h *Handler) AuthMiddleware(handlerFunc http.HandlerFunc) http.HandlerFunc {
-	return func(response http.ResponseWriter, request *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-		header := request.Header.Get(AuthorizationHeader)
+		header := r.Header.Get(AuthorizationHeader)
 
-		fmt.Println(header)
+		h.logger.Info(fmt.Sprintf("Token from header %s", header))
 
 		headerParts := strings.Split(header, " ")
 
@@ -42,10 +43,31 @@ func (h *Handler) AuthMiddleware(handlerFunc http.HandlerFunc) http.HandlerFunc 
 			return
 		}
 
-		ctx := context.WithValue(request.Context(), UserContextKey, userID)
-		request = request.WithContext(ctx)
+		r.Context()
 
-		handlerFunc(response, request)
+		ctx := context.WithValue(r.Context(), UserContextKey, userID)
+		r = r.WithContext(ctx)
+
+		handlerFunc(w, r)
 
 	}
+}
+
+// Getting userID from request context
+func (h *Handler) GetContextUserID(r *http.Request) (int, error) {
+
+	userID, ok := r.Context().Value(UserContextKey).(string)
+	if !ok {
+		h.logger.Error("Failed to parse userID from token")
+		return 0, fmt.Errorf("failed to parse userID from token")
+	}
+
+	numUserID, err := strconv.Atoi(userID)
+	if err != nil {
+		h.logger.Warn("Failed to conver string userID to int userID")
+		return 0, fmt.Errorf("failed to convert string userID to int userID")
+	}
+
+	return numUserID, err
+
 }
