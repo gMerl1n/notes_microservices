@@ -39,9 +39,10 @@ func NewManager(signingKey string, accessTokenTTL time.Duration, refreshTokenTTL
 }
 
 func (m *Manager) NewJWT(userID string) (string, error) {
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Subject:   userID,
-		ExpiresAt: time.Now().Add(m.accessTokenTTL).Unix(),
+		ExpiresAt: time.Now().Add(m.accessTokenTTL * time.Minute).Unix(),
 	})
 
 	return token.SignedString([]byte(m.signingKey))
