@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gMerl1n/notes_microservices/internal/apperrors"
@@ -62,6 +63,8 @@ func (h *HandlerUser) CreateUser(w http.ResponseWriter, r *http.Request) {
 		apperrors.BadRequestError(w, "failed to register user", 500, err.Error())
 		return
 	}
+
+	h.logger.Info(fmt.Sprintf("Created userID %d", userID))
 
 	resp, err := json.Marshal(userID)
 	if err != nil {
