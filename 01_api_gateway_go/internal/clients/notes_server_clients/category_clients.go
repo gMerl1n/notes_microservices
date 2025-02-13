@@ -151,7 +151,7 @@ func (c *ClientCategories) RemoveCategoryByID(ctx context.Context, categoryRemov
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlRemoveCategoryByID, bytes.NewBuffer(dataByes))
+	req, err := http.NewRequest(http.MethodDelete, c.notesServer.UrlRemoveCategoryByID, bytes.NewBuffer(dataByes))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new request remove notes due to error: %w", err)
 	}

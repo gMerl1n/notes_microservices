@@ -39,10 +39,10 @@ func NewHttpServer(ctx context.Context, log *logging.Logger, conf *config.Config
 	router.HandleFunc("/api_gateway/v1/delete_notes", handlers.AuthMiddleware(handlers.RemoveNotes)).Methods("DELETE")
 
 	// categories handlers
-	router.HandleFunc("/api_gateway/v1/create_category", handlers.CreateCategory).Methods("POST")
-	router.HandleFunc("/api_gateway/v1/get_category_by_id", handlers.GetCategoryByID).Methods("POST")
-	router.HandleFunc("/api_gateway/v1/get_categories", handlers.GetCategories).Methods("POST")
-	router.HandleFunc("/api_gateway/v1/remove_category_by_id", handlers.RemoveCategoryByID).Methods("DELETE")
+	router.HandleFunc("/api_gateway/v1/create_category", handlers.AuthMiddleware(handlers.CreateCategory)).Methods("POST")
+	router.HandleFunc("/api_gateway/v1/get_category_by_id", handlers.AuthMiddleware(handlers.GetCategoryByID)).Methods("POST")
+	router.HandleFunc("/api_gateway/v1/get_categories", handlers.AuthMiddleware(handlers.GetCategories)).Methods("POST")
+	router.HandleFunc("/api_gateway/v1/remove_category_by_id", handlers.AuthMiddleware(handlers.RemoveCategoryByID)).Methods("DELETE")
 
 	return &http.Server{
 		Addr:    conf.Server.Port,
