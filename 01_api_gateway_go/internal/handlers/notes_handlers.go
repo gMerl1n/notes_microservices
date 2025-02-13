@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gMerl1n/notes_microservices/internal/models"
@@ -13,6 +14,15 @@ func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var noteCreate models.NoteCreateRequest
+
+	numUserID, err := h.GetContextUserID(r)
+	if err != nil {
+		h.logger.Warn(err)
+		apperrors.BadRequestError(w, "Something wrong", 500, fmt.Sprintf("Failed to get user ID from context %s ", err))
+		return
+	}
+
+	noteCreate.UserID = numUserID
 
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&noteCreate); err != nil {
@@ -33,24 +43,33 @@ func (h *Handler) GetNoteByID(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	userId, ok := r.Context().Value(UserContextKey).(int)
-	if !ok {
-		h.logger.Error("Failed to parse userID from token")
-		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to parse userID from token")
-	}
-
 	var noteGetByID models.NoteGetRequestByID
 
-	noteGetByID.UserID = userId
+	numUserID, err := h.GetContextUserID(r)
+	if err != nil {
+		h.logger.Warn(err)
+		apperrors.BadRequestError(w, "Something wrong", 500, fmt.Sprintf("Failed to get user ID from context %s ", err))
+		return
+	}
+
+	noteGetByID.UserID = numUserID
+
+	h.logger.Info(fmt.Sprintf("Received user ID %d", numUserID))
 
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&noteGetByID); err != nil {
-		h.logger.Error("Failed to unmarshal note get by id data %w", err)
-		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to decode login user data")
+		h.logger.Error(fmt.Sprintf("Failed to unmarshal note get by id data %d", err))
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to decode note id from the request")
+		return
 	}
+
+	h.logger.Info(fmt.Sprintf("Received note ID %d", noteGetByID.NoteID))
 
 	noteID, err := h.clientNotes.GetNoteByID(r.Context(), &noteGetByID)
 	if err != nil {
+		h.logger.Error(fmt.Sprintf("Failed to get note by id %d ", err))
+		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to get note by id after request to the note service")
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -64,14 +83,18 @@ func (h *Handler) GetNotes(w http.ResponseWriter, r *http.Request) {
 
 	var notesGet models.NotesGetRequest
 
-	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&notesGet); err != nil {
-		h.logger.Error("Failed to unmarshal user ID  data to get notes %w", err)
-		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to decode login user data")
+	numUserID, err := h.GetContextUserID(r)
+	if err != nil {
+		h.logger.Warn(err)
+		apperrors.BadRequestError(w, "Something wrong", 500, fmt.Sprintf("Failed to get user ID from context %s ", err))
+		return
 	}
+
+	notesGet.UserID = numUserID
 
 	notes, err := h.clientNotes.GetNotes(r.Context(), &notesGet)
 	if err != nil {
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -84,6 +107,15 @@ func (h *Handler) RemoveNoteByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var noteRemoveByID models.NoteRemoveRequestByID
+
+	numUserID, err := h.GetContextUserID(r)
+	if err != nil {
+		h.logger.Warn(err)
+		apperrors.BadRequestError(w, "Something wrong", 500, fmt.Sprintf("Failed to get user ID from context %s ", err))
+		return
+	}
+
+	noteRemoveByID.UserID = numUserID
 
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&noteRemoveByID); err != nil {
@@ -106,11 +138,14 @@ func (h *Handler) RemoveNotes(w http.ResponseWriter, r *http.Request) {
 
 	var notesRemove models.NotesRemove
 
-	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&notesRemove); err != nil {
-		h.logger.Error("Failed to unmarshal user ID  data to remove notes %w", err)
-		apperrors.BadRequestError(w, "Something wrong", 500, "Failed to decode login user data")
+	numUserID, err := h.GetContextUserID(r)
+	if err != nil {
+		h.logger.Warn(err)
+		apperrors.BadRequestError(w, "Something wrong", 500, fmt.Sprintf("Failed to get user ID from context %s ", err))
+		return
 	}
+
+	notesRemove.UserID = numUserID
 
 	notes, err := h.clientNotes.RemoveNotes(r.Context(), &notesRemove)
 	if err != nil {
