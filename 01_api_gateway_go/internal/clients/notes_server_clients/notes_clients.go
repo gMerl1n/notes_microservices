@@ -152,7 +152,7 @@ func (c *ClientNotes) RemoveNoteByID(ctx context.Context, noteRemoveRequest *mod
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlRemoveNoteByID, bytes.NewBuffer(dataByes))
+	req, err := http.NewRequest(http.MethodDelete, c.notesServer.UrlRemoveNoteByID, bytes.NewBuffer(dataByes))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new request remove note by id due to error: %w", err)
 	}
@@ -188,7 +188,7 @@ func (c *ClientNotes) RemoveNotes(ctx context.Context, notesRemove *models.Notes
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, c.notesServer.UrlRemoveNoteByID, bytes.NewBuffer(dataByes))
+	req, err := http.NewRequest(http.MethodDelete, c.notesServer.UrlRemoveNotes, bytes.NewBuffer(dataByes))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new request remove notes due to error: %w", err)
 	}
