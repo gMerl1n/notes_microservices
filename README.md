@@ -47,24 +47,11 @@
 ![](https://github.com/iriskin77/notes_microservices/blob/master/images/db_schema.png)
 
 
-## Как запустить 
+## Roadmap and TODO
 
-Все три сервиса упакованы в Docker, поэтому:
-
-+ Запуск api-gateway: 
-  + Перейти в папку 01_api_gateway,
-  + Использовать команду docker-compose build
-  + Использовать команду docker-compose up
-
-+ Запуск auth-service: 
-  + Перейти в папку 02_auth_service,
-  + Использовать команду docker-compose build
-  + Использовать команду docker-compose up
-  + Перейти в созданный контейнер (docker exec -it <container_id> bash)
-  + Создать миграции: migrate -path ./app/migrations -database 'postgres://pguser:pgpassword@localhost:5432/postgres?sslmode=disable' up
-
-
-+ Запуск api-gateway: 
-  + Перейти в папку 03_notes_service,
-  + Использовать команду docker-compose build
-  + Использовать команду docker-compose up
++ ~~Написать Auth service~~
++ ~~Написать Note service~~
++ ~~ApiGateway~~
++ Положить все в контейнеры в докер
++ Написать тесты
++ Full description Readme
